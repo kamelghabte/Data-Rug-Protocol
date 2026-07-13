@@ -1,0 +1,500 @@
+// DATA RUG PROTOCOL // LE 18 MARRAKECH EDITION
+// VERSION : OpenProcessing / p5.js
+// DIRECTION : médina, résidence, apprentissage collectif, texture papier, néo-zellige calme
+
+// --------------------------------------------------
+// 1) CONFIG API
+// --------------------------------------------------
+let apiKey = "2f05fef27241392f92f3b94a0d889ff0";
+let city = "Marrakech,MA";
+let weatherData = null;
+
+let temp = 26;
+let humidity = 42;
+let wind = 3;
+let description = "SYNCING WITH LE 18...";
+
+// --------------------------------------------------
+// 2) MÉTIER À TISSER
+// --------------------------------------------------
+let loomGrid = [];
+let cols = 12;
+let rows = 12;
+let cellW, cellH;
+let weaveCursor = 0;
+let lastActionTime = 0;
+
+// --------------------------------------------------
+// 3) PALETTE LE 18
+// --------------------------------------------------
+let palette = {
+  terracotta: "#B85C38",
+  saffron: "#D8A21D",
+  indigo: "#314A78",
+  clay: "#C9B79C",
+  sage: "#7E8C69",
+  paper: "#F6F1E8",
+  carbon: "#161616"
+};
+
+let margin = 84;
+let bottomMargin = 170;
+let paperLayer;
+
+// --------------------------------------------------
+// 4) SETUP
+// --------------------------------------------------
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  rectMode(CENTER);
+  noStroke();
+
+  initGrid();
+  buildPaperLayer();
+
+  loadJSON(
+    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`,
+    gotWeather,
+    weatherError
+  );
+
+  if (navigator.requestMIDIAccess) {
+    navigator.requestMIDIAccess().then(onMIDISuccess, (e) => {
+      console.log("No MIDI", e);
+    });
+  }
+}
+
+function initGrid() {
+  let drawW = width - margin * 2;
+  let drawH = height - margin - bottomMargin;
+  cellW = drawW / cols;
+  cellH = drawH / rows;
+
+  loomGrid = [];
+  for (let i = 0; i < cols * rows; i++) {
+    loomGrid.push({
+      type: 0,
+      col: palette.paper,
+      accent: palette.carbon,
+      rot: 0,
+      active: false,
+      energy: 0
+    });
+  }
+}
+
+function buildPaperLayer() {
+  paperLayer = createGraphics(width, height);
+  paperLayer.clear();
+  paperLayer.noStroke();
+
+  for (let i = 0; i < width * height * 0.0012; i++) {
+    let x = random(width);
+    let y = random(height);
+    let a = random(8, 20);
+    paperLayer.fill(0, a);
+    paperLayer.circle(x, y, random(0.4, 1.4));
+  }
+
+  for (let i = 0; i < 180; i++) {
+    paperLayer.stroke(255, 18);
+    let y = random(height);
+    paperLayer.line(0, y, width, y + random(-1, 1));
+  }
+}
+
+// --------------------------------------------------
+// 5) WEATHER
+// --------------------------------------------------
+function gotWeather(data) {
+  if (!data || !data.main || !data.weather || !data.wind) return;
+
+  weatherData = data;
+  temp = data.main.temp;
+  humidity = data.main.humidity;
+  wind = data.wind.speed;
+  description = data.weather[0].description.toUpperCase();
+}
+
+function weatherError(err) {
+  console.log("Weather API error", err);
+  description = "LOCAL MEMORY MODE";
+}
+
+// --------------------------------------------------
+// 6) MIDI
+// --------------------------------------------------
+function onMIDISuccess(midi) {
+  for (let input of midi.inputs.values()) {
+    input.onmidimessage = (msg) => {
+      if (msg.data[0] === 144 && msg.data[2] > 0) {
+        weavePattern(msg.data[2]);
+        lastActionTime = millis();
+      }
+    };
+  }
+}
+
+// --------------------------------------------------
+// 7) DRAW
+// --------------------------------------------------
+function draw() {
+  background(palette.paper);
+  image(paperLayer, 0, 0);
+
+  let autoSpeed = map(constrain(wind, 0, 16), 0, 16, 950, 160);
+  if (millis() - lastActionTime > autoSpeed) {
+    autoWeave();
+    lastActionTime = millis();
+  }
+
+  push();
+  translate(margin, margin);
+  drawGridThreads();
+  drawCells();
+  drawWeaveCursor();
+  pop();
+
+  drawMuseumFrame();
+  drawHUD();
+
+  if (mouseIsPressed && frameCount % 4 === 0) {
+    autoWeave();
+  }
+}
+
+// --------------------------------------------------
+// 8) TRAME / GRILLE
+// --------------------------------------------------
+function drawGridThreads() {
+  stroke(40, 24);
+  strokeWeight(1);
+
+  for (let c = 0; c <= cols; c++) {
+    let x = c * cellW;
+    line(x, 0, x, rows * cellH);
+  }
+
+  for (let r = 0; r <= rows; r++) {
+    let y = r * cellH;
+    line(0, y, cols * cellW, y);
+  }
+
+  stroke(255, 70);
+  for (let c = 0; c < cols; c++) {
+    let x = c * cellW + cellW * 0.5;
+    line(x, 0, x, rows * cellH);
+  }
+
+  noStroke();
+}
+
+function drawCells() {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      let index = c + r * cols;
+      let cell = loomGrid[index];
+
+      let x = c * cellW + cellW * 0.5;
+      let y = r * cellH + cellH * 0.5;
+
+      let pulse = sin(frameCount * 0.02 + index * 0.15) * 0.5 + 0.5;
+      let energy = cell.energy * (0.75 + pulse * 0.25);
+
+      if (cell.active) {
+        drawLe18Motif(
+          x,
+          y,
+          cellW * 0.86,
+          cellH * 0.86,
+          cell.type,
+          cell.col,
+          cell.accent,
+          cell.rot,
+          energy
+        );
+
+        cell.energy = lerp(cell.energy, 0.14, 0.05);
+      } else {
+        fill(0, 8);
+        rect(x, y, cellW * 0.08, cellH * 0.08, 2);
+      }
+    }
+  }
+}
+
+function drawWeaveCursor() {
+  let cursorIndex = weaveCursor % (cols * rows);
+  let cursorRow = floor(cursorIndex / cols);
+  let cursorCol = cursorIndex % cols;
+
+  let y = cursorRow * cellH + cellH * 0.5;
+  let x = cursorCol * cellW + cellW * 0.5;
+
+  stroke(palette.carbon);
+  strokeWeight(1.4);
+  line(0, y, cols * cellW, y);
+
+  noFill();
+  stroke(palette.saffron);
+  rect(x, y, cellW * 0.88, cellH * 0.88);
+  noStroke();
+}
+
+// --------------------------------------------------
+// 9) LOGIQUE DE COULEUR
+// --------------------------------------------------
+function pickColor() {
+  if (temp >= 31) {
+    return random([palette.terracotta, palette.saffron, palette.clay]);
+  }
+
+  if (temp <= 18) {
+    return random([palette.indigo, palette.sage, palette.clay]);
+  }
+
+  if (humidity >= 55) {
+    return random([palette.indigo, palette.sage, palette.paper]);
+  }
+
+  return random([
+    palette.terracotta,
+    palette.indigo,
+    palette.saffron,
+    palette.clay
+  ]);
+}
+
+function pickAccent(baseCol) {
+  if (baseCol === palette.paper || baseCol === palette.clay) return palette.carbon;
+  if (baseCol === palette.indigo) return palette.paper;
+  return random([palette.paper, palette.carbon]);
+}
+
+// --------------------------------------------------
+// 10) TISSAGE
+// --------------------------------------------------
+function weavePattern(velocity) {
+  let index = weaveCursor % (cols * rows);
+
+  let motif = floor(map(constrain(humidity, 20, 90), 20, 90, 0, 3.99));
+  motif = (motif + floor(random(0, 2)) + weaveCursor) % 4;
+
+  loomGrid[index].type = motif;
+  loomGrid[index].col = pickColor();
+  loomGrid[index].accent = pickAccent(loomGrid[index].col);
+  loomGrid[index].rot = floor(random(4)) * HALF_PI;
+  loomGrid[index].active = true;
+  loomGrid[index].energy = map(constrain(velocity, 1, 127), 1, 127, 0.35, 1);
+
+  weaveCursor++;
+}
+
+function autoWeave() {
+  let ghostVelocity = map(
+    constrain(wind + humidity * 0.03, 0, 12),
+    0,
+    12,
+    34,
+    92
+  );
+  weavePattern(ghostVelocity);
+}
+
+// --------------------------------------------------
+// 11) MOTIFS LE 18
+// --------------------------------------------------
+function drawLe18Motif(x, y, w, h, type, col, accent, rot, energy) {
+  push();
+  translate(x, y);
+  rotate(rot);
+  rectMode(CENTER);
+  noStroke();
+
+  let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
+  scale(breath);
+
+  if (type === 0) {
+    fill(col);
+    rect(0, 0, w * 0.86, h * 0.86);
+
+    fill(accent);
+    rect(0, 0, w * 0.44, h * 0.44);
+
+    fill(col);
+    rect(0, 0, w * 0.14, h * 0.14);
+  } else if (type === 1) {
+    fill(col);
+    beginShape();
+    vertex(-w * 0.38, h * 0.42);
+    vertex(-w * 0.38, -h * 0.02);
+    bezierVertex(
+      -w * 0.38,
+      -h * 0.36,
+      w * 0.38,
+      -h * 0.36,
+      w * 0.38,
+      -h * 0.02
+    );
+    vertex(w * 0.38, h * 0.42);
+    endShape(CLOSE);
+
+    fill(accent);
+    rect(0, h * 0.12, w * 0.5, h * 0.12);
+
+    fill(palette.paper);
+    rect(0, h * 0.2, w * 0.14, h * 0.14, 10);
+  } else if (type === 2) {
+    fill(col);
+    diamond(0, 0, w * 0.86, h * 0.86);
+
+    fill(accent);
+    diamond(0, 0, w * 0.42, h * 0.42);
+
+    fill(palette.saffron);
+    diamond(0, 0, w * 0.12, h * 0.12);
+  } else {
+    fill(col);
+    rect(0, 0, w * 0.78, h * 0.78, 999);
+
+    fill(accent);
+    rect(0, -h * 0.13, w * 0.46, h * 0.16, 999);
+    rect(0, h * 0.13, w * 0.46, h * 0.16, 999);
+
+    fill(palette.paper);
+    circle(0, 0, w * 0.16);
+  }
+
+  pop();
+}
+
+function diamond(x, y, w, h) {
+  beginShape();
+  vertex(x, y - h * 0.5);
+  vertex(x + w * 0.5, y);
+  vertex(x, y + h * 0.5);
+  vertex(x - w * 0.5, y);
+  endShape(CLOSE);
+}
+
+// --------------------------------------------------
+// 12) CADRE / INTERFACE
+// --------------------------------------------------
+function drawMuseumFrame() {
+  rectMode(CORNER);
+
+  let paperCol = color(palette.paper);
+  paperCol.setAlpha(242);
+
+  fill(paperCol);
+  noStroke();
+  rect(0, 0, width, margin);
+  rect(0, height - bottomMargin, width, bottomMargin);
+  rect(0, margin, margin, height - margin - bottomMargin);
+  rect(width - margin, margin, margin, height - margin - bottomMargin);
+
+  noFill();
+  stroke(palette.carbon);
+  strokeWeight(1);
+  rect(margin, margin, width - margin * 2, height - margin - bottomMargin);
+
+  stroke(palette.clay);
+  strokeWeight(3);
+  line(margin, height - bottomMargin, width - margin, height - bottomMargin);
+
+  noStroke();
+}
+
+function drawHUD() {
+  let ty = height - bottomMargin + 38;
+
+  let y = year();
+  let mo = nf(month(), 2);
+  let d = nf(day(), 2);
+  let h = nf(hour(), 2);
+  let mi = nf(minute(), 2);
+  let s = nf(second(), 2);
+
+  textFont("Helvetica");
+  textStyle(NORMAL);
+
+  textAlign(LEFT, TOP);
+  fill(90);
+  textSize(10);
+  text("LE 18, MARRAKECH // CULTURAL SPACE & ARTIST RESIDENCY", margin, ty);
+
+  fill(palette.indigo);
+  textSize(11);
+  text(`SYS.TIME ${y}-${mo}-${d} [${h}:${mi}:${s}]`, margin, ty + 16);
+
+  fill(120);
+  textSize(10);
+  text(
+    `MEDINA NODE // 18 DERB EL FERRANE, RIAD LAAROUS // TEMP ${nf(temp, 1, 1)}°C  HUM ${humidity}%  WIND ${nf(wind, 1, 1)} m/s`,
+    margin,
+    ty + 32
+  );
+
+  textAlign(CENTER, TOP);
+  fill(palette.carbon);
+  textSize(16);
+  text("DATA RUG PROTOCOL // LE 18 EDITION", width * 0.5, ty);
+
+  fill(120);
+  textSize(9);
+  text(
+    "RESEARCH / CREATION / MUTUAL LEARNING / KNOWLEDGE SHARING",
+    width * 0.5,
+    ty + 18
+  );
+  text(
+    "EXHIBITIONS / RESIDENCIES / TALKS / WORKSHOPS / PUBLICATIONS",
+    width * 0.5,
+    ty + 31
+  );
+
+  let legendY = ty + 54;
+  let sw = 78;
+  let sx = width * 0.5 - sw * 1.65;
+
+  rectMode(CORNER);
+
+  fill(palette.terracotta);
+  rect(sx, legendY, 10, 10);
+  fill(105);
+  textAlign(LEFT, TOP);
+  text("HEAT / STONE", sx + 14, legendY - 1);
+
+  fill(palette.indigo);
+  rect(sx + sw, legendY, 10, 10);
+  fill(105);
+  text("SHADE / MEMORY", sx + sw + 14, legendY - 1);
+
+  fill(palette.saffron);
+  rect(sx + sw * 2, legendY, 10, 10);
+  fill(105);
+  text("LIGHT / GATHERING", sx + sw * 2 + 14, legendY - 1);
+
+  textAlign(RIGHT, TOP);
+  fill(palette.carbon);
+  textSize(11);
+  text("COLLECTIVE WEAVE: ACTIVE", width - margin, ty);
+
+  fill(110);
+  textSize(10);
+  text(`CURRENT ATMOSPHERE: ${description}`, width - margin, ty + 16);
+
+  let currentLine = floor((weaveCursor % (cols * rows)) / cols) + 1;
+  text(`GENERATION PHASE: ${currentLine}/${rows}`, width - margin, ty + 32);
+  text(`MOTIF MEMORY: ${weaveCursor}`, width - margin, ty + 48);
+}
+
+// --------------------------------------------------
+// 13) RESIZE
+// --------------------------------------------------
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  initGrid();
+  buildPaperLayer();
+}
