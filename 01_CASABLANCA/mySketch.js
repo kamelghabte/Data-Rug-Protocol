@@ -243,6 +243,13 @@ function pickAccent(baseCol) {
 function weavePattern(velocity) {
   let index = weaveCursor % (cols * rows);
 
+  // Export PNG + reset à chaque cycle complet
+  if (index === 0 && weaveCursor > 0) {
+    let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
+    saveCanvas(`DATA_RUG_IFM_01_CASABLANCA_KAMEL_GHABTE_${ts}`, 'png');
+    for (let c of loomGrid) c.active = false;
+  }
+
   // humidity → plafond de complexité (0..3)
   let complexity = floor(map(constrain(humidity, 30, 100), 30, 100, 1, 4));
   // vent fort → favorise motifs directionnels (ondes, art déco)
@@ -432,6 +439,20 @@ function drawHUD() {
   rect(sx + sw * 2, legendY, 10, 10);
   fill(130);
   text("≥ 28°C  BLANC SOLAIRE", sx + sw * 2 + 14, legendY);
+
+  // Légende morphologique
+  let morphY = legendY + 22;
+  let motifNames = ["0·SOLID", "1·ONDE", "2·ART DÉCO", "3·LOSANGE"];
+  let mstep = 88;
+  let mx = width * 0.5 - (mstep * 1.5);
+  textAlign(LEFT, TOP);
+  textSize(9);
+  for (let i = 0; i < motifNames.length; i++) {
+    fill(100);
+    rect(mx + i * mstep, morphY, 8, 8);
+    fill(130);
+    text(motifNames[i], mx + i * mstep + 12, morphY);
+  }
 
   // ---- DROITE : système ----
   textAlign(RIGHT, TOP);
