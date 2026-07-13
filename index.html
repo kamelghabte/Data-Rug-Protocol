@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DATA RUG PROTOCOL — MAROC 12 ANTENNES — Kamel Ghabte</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #f5f5f0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      padding: 60px 40px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      letter-spacing: 3px;
+      font-weight: 300;
+      margin-bottom: 12px;
+    }
+    header p {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    header .artist {
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: #95a5a6;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #111;
+      border: 1px solid #222;
+      padding: 28px 24px;
+      text-decoration: none;
+      color: #f5f5f0;
+      transition: border-color 0.3s, transform 0.2s;
+      display: block;
+    }
+    .card:hover {
+      border-color: #555;
+      transform: translateY(-2px);
+    }
+    .card .num {
+      font-size: 0.7rem;
+      color: #555;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .card .city {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .card .title {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      margin-bottom: 12px;
+    }
+    .card .palette {
+      display: flex;
+      gap: 6px;
+    }
+    .card .palette span {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+      display: block;
+    }
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      font-size: 0.75rem;
+      color: #555;
+      letter-spacing: 1px;
+    }
+    footer a { color: #7f8c8d; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DATA RUG PROTOCOL</h1>
+    <p>MAROC 12 ANTENNES — Institut Français du Maroc<br>
+    <em>"Une donnée devient un fil. Un climat devient un motif. Une ville devient un tapis."</em></p>
+    <div class="artist">KAMEL GHABTE — DATA ART — CREATIVE CODING — 2026</div>
+  </header>
+
+  <div class="grid">
+    <a class="card" href="01_CASABLANCA/">
+      <div class="num">01 / 12</div>
+      <div class="city">CASABLANCA</div>
+      <div class="title">WHITE NOISE ATLANTIC</div>
+      <div class="palette">
+        <span style="background:#F5F5F0"></span>
+        <span style="background:#1B4F72"></span>
+        <span style="background:#7F8C8D"></span>
+        <span style="background:#00BFFF"></span>
+        <span style="background:#0A0A0A"></span>
+      </div>
+    </a>
+    <a class="card" href="02_RABAT/">
+      <div class="num">02 / 12</div>
+      <div class="city">RABAT</div>
+      <div class="title">OUDAYAS GREEN CODE</div>
+      <div class="palette">
+        <span style="background:#1A5276"></span>
+        <span style="background:#1E8449"></span>
+        <span style="background:#FAF0E6"></span>
+        <span style="background:#D4AC0D"></span>
+        <span style="background:#27AE60"></span>
+      </div>
+    </a>
+    <a class="card" href="03_FES/">
+      <div class="num">03 / 12</div>
+      <div class="city">FÈS</div>
+      <div class="title">THE BLUE MEDINA ALGORITHM</div>
+      <div class="palette">
+        <span style="background:#1F618D"></span>
+        <span style="background:#CA6F1E"></span>
+        <span style="background:#FDFEFE"></span>
+        <span style="background:#148F77"></span>
+        <span style="background:#2874A6"></span>
+      </div>
+    </a>
+    <a class="card" href="04_MARRAKECH/">
+      <div class="num">04 / 12</div>
+      <div class="city">MARRAKECH</div>
+      <div class="title">OCHRE HEAT PULSE</div>
+      <div class="palette">
+        <span style="background:#D35400"></span>
+        <span style="background:#C0392B"></span>
+        <span style="background:#1A2463"></span>
+        <span style="background:#F39C12"></span>
+        <span style="background:#8B4513"></span>
+      </div>
+    </a>
+    <a class="card" href="05_TANGER/">
+      <div class="num">05 / 12</div>
+      <div class="city">TANGER</div>
+      <div class="title">STRAIT SIGNAL</div>
+      <div class="palette">
+        <span style="background:#1F3A5F"></span>
+        <span style="background:#2E86C1"></span>
+        <span style="background:#AED6F1"></span>
+        <span style="background:#5D6D7E"></span>
+        <span style="background:#D6EAF8"></span>
+      </div>
+    </a>
+    <a class="card" href="06_TETOUAN/">
+      <div class="num">06 / 12</div>
+      <div class="city">TÉTOUAN</div>
+      <div class="title">ANDALUSIAN WHITE MATRIX</div>
+      <div class="palette">
+        <span style="background:#FAFAFA;border:1px solid #ddd"></span>
+        <span style="background:#1E8449"></span>
+        <span style="background:#C0392B"></span>
+        <span style="background:#95A5A6"></span>
+        <span style="background:#2C3E50"></span>
+      </div>
+    </a>
+    <a class="card" href="07_OUJDA/">
+      <div class="num">07 / 12</div>
+      <div class="city">OUJDA</div>
+      <div class="title">GHARNATI WIND PATTERN</div>
+      <div class="palette">
+        <span style="background:#E59866"></span>
+        <span style="background:#784212"></span>
+        <span style="background:#1B2631"></span>
+        <span style="background:#F0B27A"></span>
+        <span style="background:#B7950B"></span>
+      </div>
+    </a>
+    <a class="card" href="08_ESSAOUIRA/">
+      <div class="num">08 / 12</div>
+      <div class="city">ESSAOUIRA</div>
+      <div class="title">MOGADOR WIND LOOM</div>
+      <div class="palette">
+        <span style="background:#1A5276"></span>
+        <span style="background:#FDFEFE;border:1px solid #ddd"></span>
+        <span style="background:#784212"></span>
+        <span style="background:#1D8348"></span>
+        <span style="background:#85C1E9"></span>
+      </div>
+    </a>
+    <a class="card" href="09_AGADIR/">
+      <div class="num">09 / 12</div>
+      <div class="city">AGADIR</div>
+      <div class="title">SOUSS SOLAR WEAVE</div>
+      <div class="palette">
+        <span style="background:#F4D03F"></span>
+        <span style="background:#E67E22"></span>
+        <span style="background:#1E8449"></span>
+        <span style="background:#2E86C1"></span>
+        <span style="background:#FAD7A0"></span>
+      </div>
+    </a>
+    <a class="card" href="10_KENITRA/">
+      <div class="num">10 / 12</div>
+      <div class="city">KÉNITRA</div>
+      <div class="title">SEBOU CORK MATRIX</div>
+      <div class="palette">
+        <span style="background:#1D6A39"></span>
+        <span style="background:#7D6608"></span>
+        <span style="background:#2E86C1"></span>
+        <span style="background:#6E2F1A"></span>
+        <span style="background:#52BE80"></span>
+      </div>
+    </a>
+    <a class="card" href="11_MEKNES/">
+      <div class="num">11 / 12</div>
+      <div class="city">MEKNÈS</div>
+      <div class="title">IMPERIAL OLIVE GRID</div>
+      <div class="palette">
+        <span style="background:#4A5D23"></span>
+        <span style="background:#8D8166"></span>
+        <span style="background:#C9A84C"></span>
+        <span style="background:#8B4513"></span>
+        <span style="background:#6B8E23"></span>
+      </div>
+    </a>
+    <a class="card" href="12_ELJADIDA/">
+      <div class="num">12 / 12</div>
+      <div class="city">EL JADIDA</div>
+      <div class="title">MAZAGAN CISTERN PATTERN</div>
+      <div class="palette">
+        <span style="background:#1F4E79"></span>
+        <span style="background:#5D7B6F"></span>
+        <span style="background:#BDC3C7"></span>
+        <span style="background:#7FB3D3"></span>
+        <span style="background:#2C3E50"></span>
+      </div>
+    </a>
+  </div>
+
+  <footer>
+    DATA RUG PROTOCOL — MAROC 12 ANTENNES — KAMEL GHABTE — 2026<br>
+    <a href="https://kamelghabte.me">kamelghabte.me</a> — Commission IFM
+  </footer>
+</body>
+</html>
