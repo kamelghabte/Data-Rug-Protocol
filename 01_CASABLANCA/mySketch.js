@@ -273,6 +273,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS CASABLANCA
+// Même structure que Le 18 : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -285,67 +286,61 @@ function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   scale(breath);
 
   if (type === 0) {
-    // PORTAIL — forme en T inversé, façade art déco
+    // Carré plein + carré intérieur + noyau
     fill(col);
-    rect(0, -h * 0.14, w * 0.86, h * 0.28);
-    rect(0,  h * 0.14, w * 0.38, h * 0.56);
-    // Accent : linteau horizontal
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.1);
-    // Fenêtre / œil
-    fill(palette.noir);
-    rect(0, h * 0.26, w * 0.16, h * 0.16, 999);
+    rect(0, 0, w * 0.44, h * 0.44);
+    fill(col);
+    rect(0, 0, w * 0.14, h * 0.14);
 
   } else if (type === 1) {
-    // ARCADE — arc outrepassé, Habous
+    // Arche — même structure que Le 18
     fill(col);
     beginShape();
-    vertex(-w * 0.38, h * 0.44);
+    vertex(-w * 0.38, h * 0.42);
     vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.38, w * 0.38, -h * 0.38, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.44);
+    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
+    vertex(w * 0.38, h * 0.42);
     endShape(CLOSE);
-    // Évidement intérieur
-    fill(palette.noir);
-    beginShape();
-    vertex(-w * 0.20, h * 0.44);
-    vertex(-w * 0.20, h * 0.06);
-    bezierVertex(-w * 0.20, -h * 0.18, w * 0.20, -h * 0.18, w * 0.20, h * 0.06);
-    vertex(w * 0.20, h * 0.44);
-    endShape(CLOSE);
-    // Clé de voûte
     fill(accent);
-    ellipse(0, -h * 0.16, w * 0.14, h * 0.14);
+    rect(0, h * 0.12, w * 0.5, h * 0.12);
+    fill(palette.blanc);
+    rect(0, h * 0.2, w * 0.14, h * 0.14, 10);
 
   } else if (type === 2) {
-    // DAMIER — quatre carrés alternés, zellige minimal
-    let s = w * 0.42;
+    // Losange plein + losange intérieur + accent
     fill(col);
-    rect(-s * 0.52, -s * 0.52, s, s);
-    rect( s * 0.52,  s * 0.52, s, s);
+    beginShape();
+    vertex(0, -h * 0.43);
+    vertex(w * 0.43, 0);
+    vertex(0, h * 0.43);
+    vertex(-w * 0.43, 0);
+    endShape(CLOSE);
     fill(accent);
-    rect( s * 0.52, -s * 0.52, s, s);
-    rect(-s * 0.52,  s * 0.52, s, s);
-    // Point central
-    fill(palette.noir);
-    ellipse(0, 0, w * 0.12, h * 0.12);
+    beginShape();
+    vertex(0, -h * 0.21);
+    vertex(w * 0.21, 0);
+    vertex(0, h * 0.21);
+    vertex(-w * 0.21, 0);
+    endShape(CLOSE);
+    fill(palette.cyan);
+    beginShape();
+    vertex(0, -h * 0.06);
+    vertex(w * 0.06, 0);
+    vertex(0, h * 0.06);
+    vertex(-w * 0.06, 0);
+    endShape(CLOSE);
 
   } else {
-    // FLUX — deux bandes obliques croisées, courant atlantique
+    // Cercle + bandes horizontales intérieures
     fill(col);
-    push();
-    rotate(PI * 0.12);
-    rect(0, -h * 0.16, w * 0.86, h * 0.22);
-    pop();
-    push();
-    rotate(-PI * 0.12);
-    rect(0,  h * 0.16, w * 0.86, h * 0.22);
-    pop();
-    // Nœud central
+    ellipse(0, 0, w * 0.84, h * 0.84);
     fill(accent);
-    ellipse(0, 0, w * 0.28, h * 0.28);
-    fill(palette.noir);
-    ellipse(0, 0, w * 0.12, h * 0.12);
+    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
+    rect(0, h * 0.13, w * 0.46, h * 0.14, 999);
+    fill(palette.blanc);
+    ellipse(0, 0, w * 0.16, h * 0.16);
   }
 
   pop();
