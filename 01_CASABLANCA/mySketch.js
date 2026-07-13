@@ -19,8 +19,8 @@ let description = "ATLANTIC SIGNAL...";
 // 2) MÉTIER À TISSER
 // --------------------------------------------------
 let loomGrid = [];
-let cols = 14;
-let rows = 16;
+let cols = 12;
+let rows = 14;
 let cellW, cellH;
 let weaveCursor = 0;
 let lastActionTime = 0;
@@ -259,7 +259,7 @@ function weavePattern(velocity) {
   loomGrid[index].type   = motif;
   loomGrid[index].col    = pickColor();
   loomGrid[index].accent = pickAccent(loomGrid[index].col);
-  loomGrid[index].rot    = 0; // Casa : pas de rotation (grille orthogonale, art déco)
+  loomGrid[index].rot    = floor(random(4)) * HALF_PI;
   loomGrid[index].active = true;
   loomGrid[index].energy = map(constrain(velocity, 1, 127), 1, 127, 0.35, 1);
 
@@ -273,11 +273,11 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS CASABLANCA
-// Épurés, géométriques, inspirés art déco + néo-zellige
 // --------------------------------------------------
 function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
   translate(x, y);
+  rotate(rot);
   rectMode(CENTER);
   noStroke();
 
@@ -285,44 +285,67 @@ function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   scale(breath);
 
   if (type === 0) {
-    // BLOC CONCENTRIQUE — carré dans carré, béton art déco
+    // PORTAIL — forme en T inversé, façade art déco
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, -h * 0.14, w * 0.86, h * 0.28);
+    rect(0,  h * 0.14, w * 0.38, h * 0.56);
+    // Accent : linteau horizontal
     fill(accent);
-    rect(0, 0, w * 0.52, h * 0.52);
-    fill(col);
-    rect(0, 0, w * 0.20, h * 0.20);
+    rect(0, h * 0.12, w * 0.5, h * 0.1);
+    // Fenêtre / œil
+    fill(palette.noir);
+    rect(0, h * 0.26, w * 0.16, h * 0.16, 999);
 
   } else if (type === 1) {
-    // ARCHE — portail art déco simplifié
+    // ARCADE — arc outrepassé, Habous
     fill(col);
-    rect(0, h * 0.12, w * 0.78, h * 0.65);
-    arc(0, -h * 0.10, w * 0.78, h * 0.56, PI, 0);
+    beginShape();
+    vertex(-w * 0.38, h * 0.44);
+    vertex(-w * 0.38, -h * 0.02);
+    bezierVertex(-w * 0.38, -h * 0.38, w * 0.38, -h * 0.38, w * 0.38, -h * 0.02);
+    vertex(w * 0.38, h * 0.44);
+    endShape(CLOSE);
+    // Évidement intérieur
     fill(palette.noir);
-    rect(0, h * 0.22, w * 0.38, h * 0.40);
-    arc(0, h * 0.02, w * 0.38, h * 0.40, PI, 0);
+    beginShape();
+    vertex(-w * 0.20, h * 0.44);
+    vertex(-w * 0.20, h * 0.06);
+    bezierVertex(-w * 0.20, -h * 0.18, w * 0.20, -h * 0.18, w * 0.20, h * 0.06);
+    vertex(w * 0.20, h * 0.44);
+    endShape(CLOSE);
+    // Clé de voûte
     fill(accent);
-    ellipse(0, -h * 0.10, w * 0.12, h * 0.12);
+    ellipse(0, -h * 0.16, w * 0.14, h * 0.14);
 
   } else if (type === 2) {
-    // LOSANGE — zellige, signal géométrique
+    // DAMIER — quatre carrés alternés, zellige minimal
+    let s = w * 0.42;
     fill(col);
-    quad(0, -h * 0.44, w * 0.44, 0, 0, h * 0.44, -w * 0.44, 0);
+    rect(-s * 0.52, -s * 0.52, s, s);
+    rect( s * 0.52,  s * 0.52, s, s);
     fill(accent);
-    quad(0, -h * 0.22, w * 0.22, 0, 0, h * 0.22, -w * 0.22, 0);
+    rect( s * 0.52, -s * 0.52, s, s);
+    rect(-s * 0.52,  s * 0.52, s, s);
+    // Point central
     fill(palette.noir);
-    ellipse(0, 0, w * 0.10, h * 0.10);
+    ellipse(0, 0, w * 0.12, h * 0.12);
 
   } else {
-    // CERCLE RAYONNANT — rosace art déco
+    // FLUX — deux bandes obliques croisées, courant atlantique
     fill(col);
-    ellipse(0, 0, w * 0.82, h * 0.82);
+    push();
+    rotate(PI * 0.12);
+    rect(0, -h * 0.16, w * 0.86, h * 0.22);
+    pop();
+    push();
+    rotate(-PI * 0.12);
+    rect(0,  h * 0.16, w * 0.86, h * 0.22);
+    pop();
+    // Nœud central
     fill(accent);
-    ellipse(0, 0, w * 0.50, h * 0.50);
+    ellipse(0, 0, w * 0.28, h * 0.28);
     fill(palette.noir);
-    ellipse(0, 0, w * 0.24, h * 0.24);
-    fill(col);
-    ellipse(0, 0, w * 0.10, h * 0.10);
+    ellipse(0, 0, w * 0.12, h * 0.12);
   }
 
   pop();
@@ -431,7 +454,7 @@ function drawHUD() {
 
   // Légende morphologique
   let morphY = legendY + 22;
-  let motifNames = ["0·BLOC", "1·ARCHE", "2·LOSANGE", "3·ROSACE"];
+  let motifNames = ["0·PORTAIL", "1·ARCADE", "2·DAMIER", "3·FLUX"];
   let mstep = 88;
   let mx = width * 0.5 - (mstep * 1.5);
   textAlign(LEFT, TOP);
