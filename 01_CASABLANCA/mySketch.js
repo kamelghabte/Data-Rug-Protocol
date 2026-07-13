@@ -384,17 +384,17 @@ function drawHUD() {
 
   fill(palette.cyan);
   textSize(11);
-  text(`SYS.TIME ${yr}-${mo}-${d} [${h}:${mi}:${s}]`, margin, ty + 16);
+  text(`SYS.TIME ${yr}-${mo}-${d} [${h}:${mi}:${s}]`, margin, ty + 22);
 
   fill(160);
   textSize(10);
   text(
     `33.5731N / 7.5898W  //  TEMP ${nf(temp, 1, 1)}°C  HUM ${humidity}%  WIND ${nf(wind, 1, 1)} m/s`,
-    margin, ty + 32
+    margin, ty + 44
   );
 
   fill(120);
-  text(`CONDITION : ${description}`, margin, ty + 48);
+  text(`CONDITION : ${description}`, margin, ty + 66);
 
   // ---- CENTRE : titre + légende ----
   textAlign(CENTER, TOP);
@@ -404,15 +404,15 @@ function drawHUD() {
 
   fill(palette.cyan);
   textSize(9);
-  text("WHITE NOISE ATLANTIC  —  La Ville Blanche / Fréquence Atlantique", width * 0.5, ty + 20);
+  text("WHITE NOISE ATLANTIC  —  La Ville Blanche / Fréquence Atlantique", width * 0.5, ty + 24);
 
   fill(120);
   textSize(9);
-  text("KAMEL GHABTE  //  DATA ART  //  CREATIVE CODING  //  IFM 2026", width * 0.5, ty + 33);
+  text("KAMEL GHABTE  //  DATA ART  //  CREATIVE CODING  //  IFM 2026", width * 0.5, ty + 38);
 
   // Légende chromatique
-  let legendY = ty + 54;
-  let sw = 82;
+  let legendY = ty + 60;
+  let sw = 96;
   let sx = width * 0.5 - sw * 1.5;
 
   rectMode(CORNER);
@@ -441,11 +441,11 @@ function drawHUD() {
 
   fill(160);
   textSize(10);
-  text(`CONDITION MÉTÉO : ${description}`, width - margin, ty + 16);
+  text(`CONDITION MÉTÉO : ${description}`, width - margin, ty + 22);
 
   let currentLine = floor((weaveCursor % (cols * rows)) / cols) + 1;
-  text(`PHASE : ${currentLine} / ${rows}`, width - margin, ty + 32);
-  text(`CELLULES : ${weaveCursor % (cols * rows)} / ${cols * rows}`, width - margin, ty + 48);
+  text(`PHASE : ${currentLine} / ${rows}`, width - margin, ty + 44);
+  text(`CELLULES : ${weaveCursor % (cols * rows)} / ${cols * rows}`, width - margin, ty + 66);
 }
 
 // --------------------------------------------------
