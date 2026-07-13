@@ -1,442 +1,458 @@
-// =============================================================
-// DATA RUG PROTOCOL — 01 CASABLANCA
+// DATA RUG PROTOCOL // 01 CASABLANCA
 // WHITE NOISE ATLANTIC — La Ville Blanche / Fréquence Atlantique
 // Artiste : Kamel Ghabte
 // Commission : Institut Français du Maroc (IFM)
-// Data : OpenWeather API — Casablanca, MA
-// =============================================================
 
-// --- API ---
-let apiKey = "YOUR_OPENWEATHER_KEY";
-let city   = "Casablanca,MA";
+// --------------------------------------------------
+// 1) CONFIG API
+// --------------------------------------------------
+let apiKey = "2f05fef27241392f92f3b94a0d889ff0";
+let city = "Casablanca,MA";
+let weatherData = null;
 
-// --- MÉTÉO (valeurs par défaut offline) ---
-let temp        = 20;
-let humidity    = 75;
-let wind        = 7;
+let temp = 20;
+let humidity = 75;
+let wind = 7;
 let description = "ATLANTIC SIGNAL...";
-let apiStatus   = "CONNECTING...";
 
-// --- PALETTE CASABLANCA ---
-// Blanc minéral, bleu océan, gris, noir, accent cyan
-const PAL = {
-  blanc:    '#F5F5F0',
-  ocean:    '#1B4F72',
-  mineral:  '#7F8C8D',
-  noir:     '#0A0A0A',
-  cyan:     '#00BFFF',
-  gris_fon: '#1C1C1C',
-  bordure:  '#2E86C1',
-};
-
-// --- GRILLE ---
-// Casablanca : grille dense, flux atlantique
-// humidity → complexité → cols/rows entre 18 et 28
+// --------------------------------------------------
+// 2) MÉTIER À TISSER
+// --------------------------------------------------
+let loomGrid = [];
 let cols = 20;
-let rows = 26;
+let rows = 24;
 let cellW, cellH;
-
-let loomGrid  = [];
 let weaveCursor = 0;
 let lastActionTime = 0;
 
-// --- MARGES ---
-const margin       = 70;
-const bottomMargin = 190;
+// --------------------------------------------------
+// 3) PALETTE CASABLANCA
+// Blanc minéral · Bleu océan · Gris · Noir · Cyan atlantique
+// --------------------------------------------------
+let palette = {
+  blanc:   "#F5F5F0",
+  ocean:   "#1B4F72",
+  mineral: "#7F8C8D",
+  noir:    "#0A0A0A",
+  cyan:    "#00BFFF",
+  gris:    "#2C3E50",
+  sable:   "#BDC3C7"
+};
 
-// --- MIDI ---
-let midiReady = false;
+let margin = 84;
+let bottomMargin = 170;
+let noiseLayer;
 
-// =============================================================
-// SETUP
-// =============================================================
+// --------------------------------------------------
+// 4) SETUP
+// --------------------------------------------------
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  rectMode(CENTER);
   noStroke();
-  textFont('Courier New');
 
-  computeGrid();
-  initLoom();
-  fetchWeather();
+  initGrid();
+  buildNoiseLayer();
 
-  if (navigator.requestMIDIAccess) {
-    navigator.requestMIDIAccess().then(
-      (midi) => {
-        midiReady = true;
-        for (let input of midi.inputs.values()) {
-          input.onmidimessage = onMIDI;
-        }
-      },
-      () => { midiReady = false; }
-    );
-  }
-
-  // Refresh météo toutes les 10 min
-  setInterval(fetchWeather, 10 * 60 * 1000);
+  loadJSON(
+    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`,
+    gotWeather,
+    weatherError
+  );
 }
 
-// =============================================================
-// MÉTÉO
-// =============================================================
-function fetchWeather() {
-  if (!apiKey || apiKey === "YOUR_OPENWEATHER_KEY") {
-    apiStatus = "OFFLINE — MODE LOCAL";
-    return;
-  }
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-  loadJSON(url, gotWeather, () => {
-    apiStatus = "API ERROR — FALLBACK DATA";
-  });
-}
-
-function gotWeather(data) {
-  temp        = data.main.temp;
-  humidity    = data.main.humidity;
-  wind        = data.wind.speed;
-  description = (data.weather[0].description).toUpperCase();
-  apiStatus   = "LIVE";
-}
-
-// =============================================================
-// MIDI
-// =============================================================
-function onMIDI(msg) {
-  // Note ON (status 144), velocity > 0
-  if (msg.data[0] === 144 && msg.data[2] > 0) {
-    weavePattern(msg.data[2]);
-    lastActionTime = millis();
-  }
-}
-
-// =============================================================
-// GRILLE
-// =============================================================
-function computeGrid() {
-  let drawW = width  - margin * 2;
+function initGrid() {
+  let drawW = width - margin * 2;
   let drawH = height - margin - bottomMargin;
   cellW = drawW / cols;
   cellH = drawH / rows;
-}
 
-function initLoom() {
   loomGrid = [];
   for (let i = 0; i < cols * rows; i++) {
-    loomGrid.push({ type: 0, col: PAL.noir, active: false });
+    loomGrid.push({
+      type:   0,
+      col:    palette.noir,
+      accent: palette.cyan,
+      rot:    0,
+      active: false,
+      energy: 0
+    });
   }
 }
 
-// =============================================================
-// TISSAGE
-// =============================================================
-function weavePattern(velocity) {
-  let total = cols * rows;
-  let index = weaveCursor % total;
+// Grain sombre sur fond noir (bruit blanc atlantique)
+function buildNoiseLayer() {
+  noiseLayer = createGraphics(width, height);
+  noiseLayer.clear();
+  noiseLayer.noStroke();
 
-  // Export PNG + reset à chaque cycle complet
-  if (index === 0 && weaveCursor > 0) {
-    let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
-    saveCanvas(`DATA_RUG_IFM_01_CASABLANCA_KAMEL_GHABTE_${ts}`, 'png');
-    for (let c of loomGrid) c.active = false;
+  for (let i = 0; i < width * height * 0.0010; i++) {
+    let x = random(width);
+    let y = random(height);
+    let a = random(6, 18);
+    noiseLayer.fill(255, a);
+    noiseLayer.circle(x, y, random(0.3, 1.2));
   }
 
-  // --- TYPE DE MOTIF ---
-  // humidity → complexité (0..5 types disponibles)
-  // + vent côtier influence la direction
-  let complexity = floor(map(humidity, 30, 100, 1, 5));
-  let type;
-  if (wind > 8) {
-    // vent fort : motifs directionnels (ondes, bandes)
-    type = floor(random(1, 3));
-  } else {
-    type = floor(random(0, complexity + 1));
-    type = constrain(type, 0, 5);
-  }
-
-  // --- COULEUR ---
-  // temp → choix dans la palette atlantique de Casablanca
-  let col;
-  if (temp >= 28) {
-    // Chaleur : minéral chaud, blanc, cyan
-    col = random([PAL.blanc, PAL.mineral, PAL.cyan, PAL.blanc]);
-  } else if (temp <= 16) {
-    // Froid atlantique : bleu océan profond, gris
-    col = random([PAL.ocean, PAL.mineral, PAL.gris_fon, PAL.ocean]);
-  } else {
-    // Tempéré : mélange complet palette Casablanca
-    col = random([PAL.blanc, PAL.ocean, PAL.mineral, PAL.cyan]);
-  }
-
-  // Velocity forte → accent blanc pur (bruit/flash)
-  if (velocity > 100) col = PAL.blanc;
-
-  loomGrid[index].type   = type;
-  loomGrid[index].col    = col;
-  loomGrid[index].active = true;
-  weaveCursor++;
-}
-
-function autoWeave() {
-  weavePattern(floor(random(55, 95)));
-}
-
-// =============================================================
-// MOTIFS CASABLANCA
-// Art déco, ondes atlantiques, grille dense, fréquences blanches
-// =============================================================
-function drawCasaMotif(x, y, w, h, type, col) {
-  fill(col);
-  noStroke();
-
-  if (type === 0) {
-    // SOLID — cellule pleine (béton blanc)
-    rect(x, y, w, h);
-
-  } else if (type === 1) {
-    // ONDE HORIZONTALE — fréquence atlantique
-    // 3 bandes horizontales alternées
-    let bh = h / 4;
-    rect(x,          y,          w, bh);
-    rect(x,          y + bh * 2, w, bh);
-
-  } else if (type === 2) {
-    // ART DÉCO — bandes verticales fines (façades Casablanca)
-    let bw = w / 5;
-    rect(x,          y, bw, h);
-    rect(x + bw * 2, y, bw, h);
-    rect(x + bw * 4, y, bw, h);
-
-  } else if (type === 3) {
-    // CHECKER — zellige minimaliste blanc/gris
-    rect(x,       y,       w/2, h/2);
-    rect(x + w/2, y + h/2, w/2, h/2);
-    // accent mineral sur les cases inverses
-    fill(PAL.mineral);
-    rect(x + w/2, y,       w/2, h/2);
-    rect(x,       y + h/2, w/2, h/2);
-    fill(col);
-
-  } else if (type === 4) {
-    // CROIX ART DÉCO — portail habous
-    rect(x + w * 0.35, y,           w * 0.3, h);
-    rect(x,            y + h * 0.35, w,      h * 0.3);
-
-  } else {
-    // DIAGONALE ATLANTIQUE — signal, onde basse fréquence
-    triangle(x,     y,     x + w, y,     x,     y + h);
-    fill(PAL.ocean);
-    triangle(x + w, y + h, x,     y + h, x + w, y);
-    fill(col);
-  }
-
-  // Micro-accent cyan sur vent fort (bruit de signal)
-  if (wind > 9 && random() < 0.18) {
-    fill(PAL.cyan);
-    rect(x + w * 0.1, y + h * 0.1, w * 0.15, h * 0.12);
+  // Lignes horizontales spectrales (fréquence atlantique)
+  for (let i = 0; i < 120; i++) {
+    noiseLayer.stroke(255, 10);
+    let y = random(height);
+    noiseLayer.line(0, y, width, y + random(-1, 1));
   }
 }
 
-// =============================================================
-// DRAW
-// =============================================================
+// --------------------------------------------------
+// 5) MÉTÉO
+// --------------------------------------------------
+function gotWeather(data) {
+  if (!data || !data.main || !data.weather || !data.wind) return;
+  weatherData = data;
+  temp        = data.main.temp;
+  humidity    = data.main.humidity;
+  wind        = data.wind.speed;
+  description = data.weather[0].description.toUpperCase();
+}
+
+function weatherError(err) {
+  console.log("Weather API error", err);
+  description = "LOCAL MEMORY MODE";
+}
+
+// --------------------------------------------------
+// 6) DRAW
+// --------------------------------------------------
 function draw() {
-  background(PAL.noir);
+  background(palette.noir);
+  image(noiseLayer, 0, 0);
 
-  // AUTO-PILOT : vent → vitesse (fort vent côtier = tissage rapide)
-  let autoSpeed = map(wind, 0, 20, 1200, 180);
+  let autoSpeed = map(constrain(wind, 0, 20), 0, 20, 1000, 150);
   if (millis() - lastActionTime > autoSpeed) {
     autoWeave();
     lastActionTime = millis();
   }
 
-  // --- ZONE ART ---
   push();
   translate(margin, margin);
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      let idx  = c + r * cols;
-      let cell = loomGrid[idx];
-      let x    = c * cellW;
-      let y    = r * cellH;
-
-      if (cell.active) {
-        drawCasaMotif(x, y, cellW, cellH, cell.type, cell.col);
-      } else {
-        // Fils de chaîne : lignes verticales très fines
-        stroke(35);
-        strokeWeight(0.5);
-        line(x + cellW / 2, y, x + cellW / 2, y + cellH);
-        noStroke();
-      }
-    }
-  }
-
-  // Navette (curseur de tissage) — cyan Atlantique
-  let navY = floor((weaveCursor % (cols * rows)) / cols) * cellH;
-  stroke(PAL.cyan);
-  strokeWeight(1.5);
-  line(0, navY + cellH, cols * cellW, navY + cellH);
-  noStroke();
-
+  drawGridThreads();
+  drawCells();
+  drawWeaveCursor();
   pop();
 
   drawMuseumFrame();
   drawHUD();
 
-  // Clic souris = tissage manuel
   if (mouseIsPressed && frameCount % 4 === 0) {
     autoWeave();
-    lastActionTime = millis();
   }
 }
 
-// =============================================================
-// FRAME MUSÉE
-// =============================================================
-function drawMuseumFrame() {
-  fill(PAL.noir);
+// --------------------------------------------------
+// 7) TRAME / GRILLE
+// --------------------------------------------------
+function drawGridThreads() {
+  // Fils de chaîne très fins, sombres
+  stroke(255, 14);
+  strokeWeight(0.5);
+  for (let c = 0; c <= cols; c++) {
+    let x = c * cellW;
+    line(x, 0, x, rows * cellH);
+  }
+  for (let r = 0; r <= rows; r++) {
+    let y = r * cellH;
+    line(0, y, cols * cellW, y);
+  }
+
+  // Fils de trame blancs (chaîne warp)
+  stroke(255, 45);
+  for (let c = 0; c < cols; c++) {
+    let x = c * cellW + cellW * 0.5;
+    line(x, 0, x, rows * cellH);
+  }
   noStroke();
+}
+
+function drawCells() {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      let index = c + r * cols;
+      let cell  = loomGrid[index];
+      let x     = c * cellW + cellW * 0.5;
+      let y     = r * cellH + cellH * 0.5;
+
+      let pulse  = sin(frameCount * 0.02 + index * 0.15) * 0.5 + 0.5;
+      let energy = cell.energy * (0.75 + pulse * 0.25);
+
+      if (cell.active) {
+        drawCasaMotif(x, y, cellW * 0.88, cellH * 0.88, cell.type, cell.col, cell.accent, cell.rot, energy);
+        cell.energy = lerp(cell.energy, 0.12, 0.05);
+      } else {
+        fill(255, 6);
+        rect(x, y, cellW * 0.07, cellH * 0.07, 2);
+      }
+    }
+  }
+}
+
+function drawWeaveCursor() {
+  let cursorIndex = weaveCursor % (cols * rows);
+  let cursorRow   = floor(cursorIndex / cols);
+  let cursorCol   = cursorIndex % cols;
+
+  let y = cursorRow * cellH + cellH * 0.5;
+  let x = cursorCol * cellW + cellW * 0.5;
+
+  // Ligne navette
+  stroke(palette.cyan);
+  strokeWeight(1.4);
+  line(0, y, cols * cellW, y);
+
+  // Marqueur cellule active
+  noFill();
+  stroke(palette.blanc);
+  strokeWeight(0.8);
+  rect(x, y, cellW * 0.88, cellH * 0.88);
+  noStroke();
+}
+
+// --------------------------------------------------
+// 8) LOGIQUE DE COULEUR
+// --------------------------------------------------
+function pickColor() {
+  // Froid atlantique
+  if (temp <= 16) {
+    return random([palette.ocean, palette.mineral, palette.gris]);
+  }
+  // Chaleur estivale
+  if (temp >= 28) {
+    return random([palette.blanc, palette.sable, palette.cyan]);
+  }
+  // Tempéré : mélange palette complète
+  return random([palette.blanc, palette.ocean, palette.mineral, palette.cyan]);
+}
+
+function pickAccent(baseCol) {
+  if (baseCol === palette.blanc || baseCol === palette.sable) return palette.ocean;
+  if (baseCol === palette.ocean) return palette.cyan;
+  return palette.blanc;
+}
+
+// --------------------------------------------------
+// 9) TISSAGE
+// --------------------------------------------------
+function weavePattern(velocity) {
+  let index = weaveCursor % (cols * rows);
+
+  // humidity → complexité motif (0..3)
+  let motif = floor(map(constrain(humidity, 30, 100), 30, 100, 0, 3.99));
+  // vent fort → motifs directionnels (ondes)
+  if (wind > 9) motif = (motif % 2) + 1;
+  motif = (motif + weaveCursor) % 4;
+
+  loomGrid[index].type   = motif;
+  loomGrid[index].col    = pickColor();
+  loomGrid[index].accent = pickAccent(loomGrid[index].col);
+  loomGrid[index].rot    = 0; // Casa : pas de rotation (grille orthogonale, art déco)
+  loomGrid[index].active = true;
+  loomGrid[index].energy = map(constrain(velocity, 1, 127), 1, 127, 0.35, 1);
+
+  weaveCursor++;
+}
+
+function autoWeave() {
+  let ghostVelocity = map(constrain(wind + humidity * 0.04, 0, 14), 0, 14, 34, 92);
+  weavePattern(ghostVelocity);
+}
+
+// --------------------------------------------------
+// 10) MOTIFS CASABLANCA
+// Art déco, ondes atlantiques, zellige minimaliste, signal blanc
+// --------------------------------------------------
+function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
+  push();
+  translate(x, y);
+  rectMode(CENTER);
+  noStroke();
+
+  let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.018 * energy;
+  scale(breath);
+
+  if (type === 0) {
+    // SOLID — béton blanc, carré plein (blocs haussmanniens)
+    fill(col);
+    rect(0, 0, w * 0.88, h * 0.88);
+    fill(accent);
+    rect(0, 0, w * 0.42, h * 0.42);
+    fill(col);
+    rect(0, 0, w * 0.14, h * 0.14);
+
+  } else if (type === 1) {
+    // ONDE HORIZONTALE — fréquence atlantique, 3 bandes
+    fill(col);
+    rect(0, -h * 0.25, w * 0.88, h * 0.22);
+    rect(0,  h * 0.00, w * 0.88, h * 0.22);
+    rect(0,  h * 0.25, w * 0.88, h * 0.22);
+    // Séparation accent
+    fill(accent);
+    rect(0, -h * 0.125, w * 0.88, h * 0.04);
+    rect(0,  h * 0.125, w * 0.88, h * 0.04);
+
+  } else if (type === 2) {
+    // ART DÉCO — façades Casablanca, bandes verticales + couronnement
+    fill(col);
+    rect(-w * 0.27, 0, w * 0.22, h * 0.88);
+    rect( w * 0.27, 0, w * 0.22, h * 0.88);
+    // Bande centrale fine
+    fill(accent);
+    rect(0, 0, w * 0.10, h * 0.88);
+    // Couronnement (corniche art déco)
+    fill(col);
+    rect(0, -h * 0.38, w * 0.88, h * 0.16);
+
+  } else {
+    // LOSANGE — zellige, signal, croix du détroit
+    fill(col);
+    beginShape();
+    vertex( 0,       -h * 0.44);
+    vertex( w * 0.44, 0);
+    vertex( 0,        h * 0.44);
+    vertex(-w * 0.44, 0);
+    endShape(CLOSE);
+    fill(accent);
+    beginShape();
+    vertex( 0,       -h * 0.22);
+    vertex( w * 0.22, 0);
+    vertex( 0,        h * 0.22);
+    vertex(-w * 0.22, 0);
+    endShape(CLOSE);
+    fill(palette.noir);
+    circle(0, 0, w * 0.10);
+  }
+
+  pop();
+}
+
+// --------------------------------------------------
+// 11) CADRE MUSÉE
+// --------------------------------------------------
+function drawMuseumFrame() {
   rectMode(CORNER);
 
-  // Bandes opaques 4 côtés
+  // Bandes noires opaques sur les 4 côtés
+  fill(palette.noir);
+  noStroke();
   rect(0,              0,               width,  margin);
   rect(0,              height - bottomMargin, width, bottomMargin);
   rect(0,              margin,          margin, height - margin - bottomMargin);
   rect(width - margin, margin,          margin, height - margin - bottomMargin);
 
-  // Bordure fine couleur océan
+  // Bordure fine bleu océan
   noFill();
-  stroke(PAL.bordure);
+  stroke(palette.ocean);
   strokeWeight(1);
   rect(margin, margin, width - margin * 2, height - margin - bottomMargin);
+
+  // Ligne séparatrice HUD — cyan
+  stroke(palette.cyan);
+  strokeWeight(2);
+  line(margin, height - bottomMargin, width - margin, height - bottomMargin);
+
   noStroke();
 }
 
-// =============================================================
-// HUD
-// =============================================================
+// --------------------------------------------------
+// 12) HUD
+// --------------------------------------------------
 function drawHUD() {
-  let bx = margin;
-  let by = height - bottomMargin + 22;
+  let ty = height - bottomMargin + 38;
 
-  // ---- COLONNE GAUCHE : identité + météo ----
-  textAlign(LEFT, TOP);
+  let yr  = year();
+  let mo  = nf(month(), 2);
+  let d   = nf(day(), 2);
+  let h   = nf(hour(), 2);
+  let mi  = nf(minute(), 2);
+  let s   = nf(second(), 2);
 
-  // Titre
-  fill(PAL.blanc);
-  textSize(17);
-  textStyle(BOLD);
-  text("DATA RUG PROTOCOL  //  01 CASABLANCA", bx, by);
-
-  textSize(10);
+  textFont("Helvetica");
   textStyle(NORMAL);
-  fill(PAL.cyan);
-  text("WHITE NOISE ATLANTIC  —  La Ville Blanche / Fréquence Atlantique", bx, by + 22);
 
-  // Artiste
-  fill(PAL.mineral);
+  // ---- GAUCHE : localisation + data ----
+  textAlign(LEFT, TOP);
+  fill(140);
   textSize(10);
-  text("ARTISTE : KAMEL GHABTE  |  IFM — INSTITUT FRANÇAIS DU MAROC", bx, by + 38);
+  text("CASABLANCA, MAROC // INSTITUT FRANÇAIS DU MAROC", margin, ty);
 
-  // Date/heure
-  fill(PAL.blanc);
+  fill(palette.cyan);
+  textSize(11);
+  text(`SYS.TIME ${yr}-${mo}-${d} [${h}:${mi}:${s}]`, margin, ty + 16);
+
+  fill(160);
   textSize(10);
-  let ts = `${day()}/${month()}/${year()}  ${nf(hour(),2)}:${nf(minute(),2)}:${nf(second(),2)}`;
-  text(`DATE : ${ts}`, bx, by + 55);
+  text(
+    `33.5731N / 7.5898W  //  TEMP ${nf(temp, 1, 1)}°C  HUM ${humidity}%  WIND ${nf(wind, 1, 1)} m/s`,
+    margin, ty + 32
+  );
 
-  // Météo
-  fill(PAL.cyan);
-  textSize(10);
-  text(`TEMP : ${nf(temp,1,1)}°C   |   HUMIDITY : ${humidity}%   |   WIND : ${nf(wind,1,1)} m/s`, bx, by + 72);
-  fill(PAL.mineral);
-  text(`CONDITION : ${description}`, bx, by + 87);
+  fill(120);
+  text(`CONDITION : ${description}`, margin, ty + 48);
 
-  // Status API
-  fill(apiStatus === "LIVE" ? '#2ECC71' : '#E74C3C');
-  text(`● API : ${apiStatus}`, bx, by + 103);
-
-  // MIDI
-  fill(midiReady ? '#2ECC71' : PAL.mineral);
-  text(`● MIDI : ${midiReady ? "CONNECTÉ" : "NON DÉTECTÉ"}`, bx + 160, by + 103);
-
-  // ---- COLONNE CENTRE : légendes ----
-  let cx = width / 2;
+  // ---- CENTRE : titre + légende ----
   textAlign(CENTER, TOP);
+  fill(palette.blanc);
+  textSize(16);
+  text("DATA RUG PROTOCOL // 01 CASABLANCA", width * 0.5, ty);
 
-  fill(PAL.mineral);
+  fill(palette.cyan);
   textSize(9);
-  text("LÉGENDE CHROMATIQUE — TEMPÉRATURE", cx, by + 2);
+  text("WHITE NOISE ATLANTIC  —  La Ville Blanche / Fréquence Atlantique", width * 0.5, ty + 20);
 
-  // Swatches couleurs
-  let sw = 80;
-  let sx = cx - sw * 1.5;
-  let sy = by + 16;
+  fill(120);
+  textSize(9);
+  text("KAMEL GHABTE  //  DATA ART  //  CREATIVE CODING  //  IFM 2026", width * 0.5, ty + 33);
+
+  // Légende chromatique
+  let legendY = ty + 54;
+  let sw = 82;
+  let sx = width * 0.5 - sw * 1.5;
+
   rectMode(CORNER);
-
-  // Froid
-  fill(PAL.ocean);
-  rect(sx, sy, 10, 10);
-  fill(PAL.mineral);
+  fill(palette.ocean);
+  rect(sx, legendY, 10, 10);
+  fill(130);
   textAlign(LEFT, TOP);
   textSize(9);
-  text("≤ 16°C  ATLANTIQUE", sx + 14, sy);
+  text("≤ 16°C  ATLANTIQUE", sx + 14, legendY);
 
-  // Tempéré
-  fill(PAL.blanc);
-  rect(sx + sw, sy, 10, 10);
-  fill(PAL.mineral);
-  text("17–27°C  BLANC MINÉRAL", sx + sw + 14, sy);
+  fill(palette.mineral);
+  rect(sx + sw, legendY, 10, 10);
+  fill(130);
+  text("17–27°C  MINÉRAL", sx + sw + 14, legendY);
 
-  // Chaud
-  fill(PAL.cyan);
-  rect(sx + sw * 2.3, sy, 10, 10);
-  fill(PAL.mineral);
-  text("≥ 28°C  CYAN SOLAIRE", sx + sw * 2.3 + 14, sy);
+  fill(palette.cyan);
+  rect(sx + sw * 2, legendY, 10, 10);
+  fill(130);
+  text("≥ 28°C  BLANC SOLAIRE", sx + sw * 2 + 14, legendY);
 
-  // Légende morphologique
-  textAlign(CENTER, TOP);
-  fill(PAL.mineral);
-  textSize(9);
-  text("LÉGENDE MORPHOLOGIQUE — MOTIFS", cx, by + 44);
-
-  let mx   = cx - 220;
-  let my   = by + 57;
-  let mstep = 88;
-  let motifs = ["0.SOLID", "1.ONDE", "2.ART DÉCO", "3.CHECKER", "4.CROIX", "5.SIGNAL"];
-  textAlign(LEFT, TOP);
-  for (let i = 0; i < motifs.length; i++) {
-    fill(PAL.mineral);
-    textSize(8);
-    text(motifs[i], mx + i * mstep, my);
-    // mini preview du motif
-    drawCasaMotif(mx + i * mstep, my + 11, 14, 14, i, PAL.blanc);
-  }
-
-  // ---- COLONNE DROITE : système ----
+  // ---- DROITE : système ----
   textAlign(RIGHT, TOP);
+  fill(palette.blanc);
+  textSize(11);
+  text("ALGORITHME ACTIF", width - margin, ty);
 
-  fill(PAL.mineral);
-  textSize(9);
-  text("ALGORITHME ACTIF", width - margin, by + 2);
-
-  fill(PAL.blanc);
+  fill(160);
   textSize(10);
-  let currentRow = floor((weaveCursor % (cols * rows)) / cols) + 1;
-  text(`LIGNE : ${currentRow} / ${rows}`, width - margin, by + 18);
-  text(`CELLULES : ${weaveCursor % (cols * rows)} / ${cols * rows}`, width - margin, by + 33);
-  text(`CYCLES : ${floor(weaveCursor / (cols * rows))}`, width - margin, by + 48);
+  text(`CONDITION MÉTÉO : ${description}`, width - margin, ty + 16);
 
-  fill(PAL.mineral);
-  textSize(9);
-  text(`GRILLE : ${cols} × ${rows}`, width - margin, by + 68);
-  text(`VENT VITESSE AUTO-PILOT`, width - margin, by + 82);
-  text(`CASABLANCA  33.5731N / 7.5898W`, width - margin, by + 97);
+  let currentLine = floor((weaveCursor % (cols * rows)) / cols) + 1;
+  text(`PHASE : ${currentLine} / ${rows}`, width - margin, ty + 32);
+  text(`CELLULES : ${weaveCursor % (cols * rows)} / ${cols * rows}`, width - margin, ty + 48);
 }
 
-// =============================================================
-// RESIZE
-// =============================================================
+// --------------------------------------------------
+// 13) RESIZE
+// --------------------------------------------------
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  computeGrid();
+  initGrid();
+  buildNoiseLayer();
 }
