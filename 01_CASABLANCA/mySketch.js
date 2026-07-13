@@ -243,11 +243,11 @@ function pickAccent(baseCol) {
 function weavePattern(velocity) {
   let index = weaveCursor % (cols * rows);
 
-  // humidity → complexité motif (0..3)
-  let motif = floor(map(constrain(humidity, 30, 100), 30, 100, 0, 3.99));
-  // vent fort → motifs directionnels (ondes)
-  if (wind > 9) motif = (motif % 2) + 1;
-  motif = (motif + weaveCursor) % 4;
+  // humidity → plafond de complexité (0..3)
+  let complexity = floor(map(constrain(humidity, 30, 100), 30, 100, 1, 4));
+  // vent fort → favorise motifs directionnels (ondes, art déco)
+  let pool = wind > 9 ? [1, 2, 1, 2, 0] : Array.from({length: complexity + 1}, (_, i) => i);
+  let motif = random(pool);
 
   loomGrid[index].type   = motif;
   loomGrid[index].col    = pickColor();
