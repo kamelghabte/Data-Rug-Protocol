@@ -273,7 +273,6 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS CASABLANCA
-// Art déco, ondes atlantiques, zellige minimaliste, signal blanc
 // --------------------------------------------------
 function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -285,55 +284,88 @@ function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   scale(breath);
 
   if (type === 0) {
-    // SOLID — béton blanc, carré plein (blocs haussmanniens)
+    // ÉTOILE ART DÉCO — deux carrés superposés tournés 45°, ornement central
+    // Inspiré des rosaces et grilles des façades art déco casablancaises
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, 0, w * 0.72, h * 0.72);
+    push();
+    rotate(PI / 4);
+    fill(col);
+    rect(0, 0, w * 0.72, h * 0.72);
+    pop();
+    // Cercle blanc central qui perce l'étoile
+    fill(palette.noir);
+    ellipse(0, 0, w * 0.38, h * 0.38);
+    // Point d'accent — joyau central
     fill(accent);
-    rect(0, 0, w * 0.42, h * 0.42);
+    ellipse(0, 0, w * 0.22, h * 0.22);
     fill(col);
-    rect(0, 0, w * 0.14, h * 0.14);
+    ellipse(0, 0, w * 0.09, h * 0.09);
 
   } else if (type === 1) {
-    // ONDE HORIZONTALE — fréquence atlantique, 3 bandes
+    // ARCADE HABOUS — arche en plein cintre, portail des Habous
+    // Corps de l'arcade
     fill(col);
-    rect(0, -h * 0.25, w * 0.88, h * 0.22);
-    rect(0,  h * 0.00, w * 0.88, h * 0.22);
-    rect(0,  h * 0.25, w * 0.88, h * 0.22);
-    // Séparation accent
+    rect(0, h * 0.18, w * 0.72, h * 0.56);
+    // Voûte en arc de cercle
+    arc(0, -h * 0.04, w * 0.72, h * 0.60, PI, 0);
+    // Vide intérieur — ouverture de la porte
+    fill(palette.noir);
+    arc(0, h * 0.06, w * 0.44, h * 0.50, PI, 0);
+    rect(0, h * 0.28, w * 0.44, h * 0.28);
+    // Clé de voûte en accent
     fill(accent);
-    rect(0, -h * 0.125, w * 0.88, h * 0.04);
-    rect(0,  h * 0.125, w * 0.88, h * 0.04);
+    ellipse(0, -h * 0.04, w * 0.14, h * 0.10);
+    // Impostes latérales
+    fill(col);
+    rect(-w * 0.30, h * 0.06, w * 0.08, h * 0.12);
+    rect( w * 0.30, h * 0.06, w * 0.08, h * 0.12);
 
   } else if (type === 2) {
-    // ART DÉCO — façades Casablanca, bandes verticales + couronnement
+    // VAGUE ATLANTIQUE — courbe bezier, fréquence de l'océan
+    // Fond coloré plein
     fill(col);
-    rect(-w * 0.27, 0, w * 0.22, h * 0.88);
-    rect( w * 0.27, 0, w * 0.22, h * 0.88);
-    // Bande centrale fine
+    rect(0, 0, w * 0.92, h * 0.92);
+    // Vague en bezier — accent couleur
     fill(accent);
-    rect(0, 0, w * 0.10, h * 0.88);
-    // Couronnement (corniche art déco)
-    fill(col);
-    rect(0, -h * 0.38, w * 0.88, h * 0.16);
+    beginShape();
+    vertex(-w * 0.46,  h * 0.05);
+    bezierVertex(-w * 0.20, -h * 0.28,  w * 0.20, -h * 0.28,  w * 0.46, h * 0.05);
+    bezierVertex( w * 0.20,  h * 0.28, -w * 0.20,  h * 0.28, -w * 0.46, h * 0.05);
+    endShape(CLOSE);
+    // Crête de vague — blanc
+    fill(palette.blanc);
+    beginShape();
+    vertex(-w * 0.46,  h * 0.05);
+    bezierVertex(-w * 0.20, -h * 0.28,  w * 0.20, -h * 0.28,  w * 0.46, h * 0.05);
+    bezierVertex( w * 0.20, -h * 0.10, -w * 0.20, -h * 0.10, -w * 0.46, h * 0.05);
+    endShape(CLOSE);
+    // Point de mousse
+    fill(palette.blanc);
+    ellipse(0, -h * 0.20, w * 0.10, h * 0.08);
 
   } else {
-    // LOSANGE — zellige, signal, croix du détroit
+    // ZELLIGE OCTOGONAL — octogone imbriqué + carré, géométrie islamique
+    // Octogone extérieur
     fill(col);
     beginShape();
-    vertex( 0,       -h * 0.44);
-    vertex( w * 0.44, 0);
-    vertex( 0,        h * 0.44);
-    vertex(-w * 0.44, 0);
+    for (let i = 0; i < 8; i++) {
+      let a = TWO_PI / 8 * i - PI / 8;
+      vertex(cos(a) * w * 0.44, sin(a) * h * 0.44);
+    }
     endShape(CLOSE);
+    // Carré intérieur en accent
     fill(accent);
-    beginShape();
-    vertex( 0,       -h * 0.22);
-    vertex( w * 0.22, 0);
-    vertex( 0,        h * 0.22);
-    vertex(-w * 0.22, 0);
-    endShape(CLOSE);
-    fill(palette.noir);
-    circle(0, 0, w * 0.10);
+    push();
+    rotate(PI / 4);
+    rect(0, 0, w * 0.38, h * 0.38);
+    pop();
+    // Noyau couleur
+    fill(col);
+    ellipse(0, 0, w * 0.22, h * 0.22);
+    // Point central
+    fill(palette.blanc);
+    ellipse(0, 0, w * 0.08, h * 0.08);
   }
 
   pop();
@@ -442,7 +474,7 @@ function drawHUD() {
 
   // Légende morphologique
   let morphY = legendY + 22;
-  let motifNames = ["0·SOLID", "1·ONDE", "2·ART DÉCO", "3·LOSANGE"];
+  let motifNames = ["0·ÉTOILE", "1·ARCADE", "2·VAGUE", "3·ZELLIGE"];
   let mstep = 88;
   let mx = width * 0.5 - (mstep * 1.5);
   textAlign(LEFT, TOP);

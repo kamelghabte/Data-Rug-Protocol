@@ -63,10 +63,10 @@ Fond sombre, grain de bruit blanc en surimpression — la ville la nuit, vue dep
 
 | # | Nom | Référence culturelle |
 |---|---|---|
-| 0 | SOLID | Blocs béton, Casablanca blanche |
-| 1 | ONDE HORIZONTALE | Fréquence atlantique, vagues |
-| 2 | ART DÉCO | Façades centre-ville, bandes verticales |
-| 3 | LOSANGE | Zellige minimaliste, signal croix |
+| 0 | ÉTOILE ART DÉCO | Deux carrés tournés 45° — rosaces des façades art déco |
+| 1 | ARCADE HABOUS | Arche en plein cintre — portails du quartier Habous |
+| 2 | VAGUE ATLANTIQUE | Courbe bezier — fréquence de l'océan, Corniche |
+| 3 | ZELLIGE OCTOGONAL | Octogone imbriqué — géométrie islamique, zellige |
 
 ---
 
