@@ -126,13 +126,6 @@ function draw() {
   background(palette.noir);
   image(textureLayer, 0, 0);
 
-  // Essaouira : vent toujours fort → tissage rapide par défaut
-  let autoSpeed = map(constrain(wind, 0, 25), 0, 25, 900, 100);
-  if (millis() - lastActionTime > autoSpeed) {
-    autoWeave();
-    lastActionTime = millis();
-  }
-
   push();
   translate(margin, margin);
   drawGridThreads();
@@ -143,14 +136,28 @@ function draw() {
   drawMuseumFrame();
   drawHUD();
 
-  if (mouseIsPressed && frameCount % 4 === 0) {
-    autoWeave();
-  }
-
   if (pendingExport) {
     pendingExport = false;
+    noLoop();
     let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
     saveCanvas(`DATA_RUG_IFM_08_ESSAOUIRA_KAMEL_GHABTE_${ts}`, 'png');
+    setTimeout(() => {
+      for (let c of loomGrid) c.active = false;
+      weaveCursor = 0;
+      lastActionTime = millis();
+      loop();
+    }, 200);
+    return;
+  }
+
+  let autoSpeed = map(constrain(wind, 0, 20), 0, 20, 1000, 150);
+  if (millis() - lastActionTime > autoSpeed) {
+    autoWeave();
+    lastActionTime = millis();
+  }
+
+  if (mouseIsPressed && frameCount % 4 === 0) {
+    autoWeave();
   }
 }
 
@@ -243,10 +250,9 @@ function pickAccent(baseCol) {
 function weavePattern(velocity) {
   let index = weaveCursor % (cols * rows);
 
-  // Marque export + reset à chaque cycle complet (saveCanvas appelé après drawHUD)
-  if (index === 0 && weaveCursor > 0) {
+  // Dernier motif posé → flag export
+  if (index === cols * rows - 1) {
     pendingExport = true;
-    for (let c of loomGrid) c.active = false;
   }
 
   let complexity = floor(map(constrain(humidity, 40, 100), 40, 100, 1, 4));
