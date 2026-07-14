@@ -127,12 +127,6 @@ function draw() {
   background(palette.noir);
   image(noiseLayer, 0, 0);
 
-  let autoSpeed = map(constrain(wind, 0, 20), 0, 20, 1000, 150);
-  if (millis() - lastActionTime > autoSpeed) {
-    autoWeave();
-    lastActionTime = millis();
-  }
-
   push();
   translate(margin, margin);
   drawGridThreads();
@@ -143,14 +137,31 @@ function draw() {
   drawMuseumFrame();
   drawHUD();
 
-  if (mouseIsPressed && frameCount % 4 === 0) {
-    autoWeave();
-  }
-
+  // Export AVANT tout nouveau tissage
   if (pendingExport) {
     pendingExport = false;
+    // Capture synchrone des pixels MAINTENANT, avant tout autre draw
+    let cnv = document.querySelector('canvas');
+    let dataURL = cnv.toDataURL('image/png');
     let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
-    saveCanvas(`DATA_RUG_IFM_01_CASABLANCA_KAMEL_GHABTE_${ts}`, 'png');
+    let a = document.createElement('a');
+    a.href = dataURL;
+    a.download = `DATA_RUG_IFM_01_CASABLANCA_KAMEL_GHABTE_${ts}.png`;
+    a.click();
+    for (let c of loomGrid) c.active = false;
+    weaveCursor = 0;
+    lastActionTime = millis();
+    return;
+  }
+
+  let autoSpeed = map(constrain(wind, 0, 20), 0, 20, 1000, 150);
+  if (millis() - lastActionTime > autoSpeed) {
+    autoWeave();
+    lastActionTime = millis();
+  }
+
+  if (mouseIsPressed && frameCount % 4 === 0) {
+    autoWeave();
   }
 }
 
@@ -250,12 +261,6 @@ function pickAccent(baseCol) {
 function weavePattern(velocity) {
   let index = weaveCursor % (cols * rows);
 
-  // Marque export + reset à chaque cycle complet (saveCanvas appelé après drawHUD)
-  if (index === 0 && weaveCursor > 0) {
-    pendingExport = true;
-    for (let c of loomGrid) c.active = false;
-  }
-
   // humidity → plafond de complexité (0..3)
   let complexity = floor(map(constrain(humidity, 30, 100), 30, 100, 1, 4));
   // vent fort → favorise motifs directionnels (ondes, art déco)
@@ -268,6 +273,11 @@ function weavePattern(velocity) {
   loomGrid[index].rot    = floor(random(4)) * HALF_PI;
   loomGrid[index].active = true;
   loomGrid[index].energy = map(constrain(velocity, 1, 127), 1, 127, 0.35, 1);
+
+  // Dernier motif posé → flag export (saveCanvas tiré après drawHUD dans draw)
+  if (index === cols * rows - 1) {
+    pendingExport = true;
+  }
 
   weaveCursor++;
 }
