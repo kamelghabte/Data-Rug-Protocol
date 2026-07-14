@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS TANGER
-// Flux detroit diagonaux, phare, vagues croisees, kasbah port
+// Detroit et horizons : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawTangerMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -286,70 +286,55 @@ function drawTangerMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // DETROIT -- deux flux diagonaux croises
+    // DETROIT -- triangle pointe, deux mers convergent
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    beginShape();
+    vertex(0, -h * 0.44);
+    vertex(w * 0.44, h * 0.44);
+    vertex(-w * 0.44, h * 0.44);
+    endShape(CLOSE);
     fill(accent);
-    push(); rotate(PI / 4);
-    rect(0, 0, w * 0.72, h * 0.22 * energy);
-    pop();
-    push(); rotate(-PI / 4);
-    rect(0, 0, w * 0.72, h * 0.22 * energy);
-    pop();
-    fill(col);
-    ellipse(0, 0, w * 0.18, h * 0.18);
+    beginShape();
+    vertex(0, -h * 0.14);
+    vertex(w * 0.22, h * 0.28);
+    vertex(-w * 0.22, h * 0.28);
+    endShape(CLOSE);
+    fill(palette.horizon);
+    ellipse(0, h * 0.08, w * 0.12, h * 0.12);
   } else if (type === 1) {
-    // PHARE -- faisceau rotatif
+    // HORIZON -- demi-cercle, ligne de mer
     fill(col);
-    ellipse(0, h * 0.14, w * 0.32, h * 0.52);
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    ellipse(0, -h * 0.22, w * 0.22, h * 0.22);
-    push();
-    rotate(frameCount * 0.04);
-    fill(accent);
-    beginShape();
-    vertex(0, -h * 0.22);
-    vertex(w * 0.38, -h * 0.44);
-    vertex(w * 0.16, -h * 0.44);
-    endShape(CLOSE);
-    pop();
-    fill(col);
-    ellipse(0, -h * 0.22, w * 0.08, h * 0.08);
+    arc(0, h * 0.06, w * 0.76, h * 0.76, PI, TWO_PI);
+    fill(palette.brume);
+    rect(0, h * 0.06, w * 0.76, h * 0.08);
   } else if (type === 2) {
-    // VAGUE CROISEE -- deux systemes perpendiculaires
-    fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    stroke(accent);
-    strokeWeight(1.8 * energy);
-    noFill();
-    for (let i = -1; i <= 1; i++) {
-      beginShape();
-      for (let t = -w * 0.4; t <= w * 0.4; t += 2) {
-        vertex(t, i * h * 0.22 + sin((t / w) * TWO_PI) * h * 0.1);
-      }
-      endShape();
-      beginShape();
-      for (let t = -h * 0.4; t <= h * 0.4; t += 2) {
-        vertex(i * w * 0.22 + sin((t / h) * TWO_PI) * w * 0.1, t);
-      }
-      endShape();
-    }
-    noStroke();
-  } else {
-    // KASBAH PORT -- trapeze fortifie
+    // PORT -- losange, croisement de routes maritimes
     fill(col);
     beginShape();
-    vertex(-w * 0.42, h * 0.42);
-    vertex(-w * 0.28, -h * 0.22);
-    vertex(w * 0.28, -h * 0.22);
-    vertex(w * 0.42, h * 0.42);
+    vertex(0, -h * 0.44);
+    vertex(w * 0.44, 0);
+    vertex(0, h * 0.44);
+    vertex(-w * 0.44, 0);
     endShape(CLOSE);
     fill(accent);
-    rect(0, -h * 0.22, w * 0.56, h * 0.1);
-    for (let i = -1; i <= 1; i++) {
-      fill(col);
-      rect(i * w * 0.18, -h * 0.3, w * 0.1, h * 0.14);
-    }
+    beginShape();
+    vertex(0, -h * 0.2);
+    vertex(w * 0.2, 0);
+    vertex(0, h * 0.2);
+    vertex(-w * 0.2, 0);
+    endShape(CLOSE);
+    fill(palette.horizon);
+    ellipse(0, 0, w * 0.1, h * 0.1);
+  } else {
+    // PHARE -- rectangle + cercle sommet, signal cote
+    fill(col);
+    rect(0, h * 0.08, w * 0.3, h * 0.64);
+    fill(accent);
+    ellipse(0, -h * 0.28, w * 0.44, h * 0.34);
+    fill(palette.horizon);
+    ellipse(0, -h * 0.28, w * 0.18, h * 0.14);
   }
   pop();
 }

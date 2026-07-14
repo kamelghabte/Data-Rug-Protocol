@@ -278,7 +278,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS TETOUAN
-// Porte andalouse, broderie croix, tile 4 petales, fontaine octogone
+// Blanc andalou et broderie : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawTetouanMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -289,72 +289,51 @@ function drawTetouanMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // PORTE ANDALOUSE -- arc en fer a cheval
+    // PORTE VERTE -- arc en fer a cheval sur rectangle
     fill(col);
-    rect(0, h * 0.18, w * 0.56, h * 0.5);
-    beginShape();
-    vertex(-w * 0.28, h * 0.18);
-    vertex(-w * 0.28, -h * 0.08);
-    bezierVertex(-w * 0.28, -h * 0.44, w * 0.28, -h * 0.44, w * 0.28, -h * 0.08);
-    vertex(w * 0.28, h * 0.18);
-    endShape(CLOSE);
+    rect(0, h * 0.14, w * 0.62, h * 0.56);
+    fill(col);
+    ellipse(0, -h * 0.14, w * 0.62, h * 0.56);
     fill(accent);
-    rect(0, -h * 0.28, w * 0.56, h * 0.06);
+    rect(0, h * 0.14, w * 0.32, h * 0.38);
     fill(col);
-    ellipse(0, -h * 0.28, w * 0.14, h * 0.14);
+    ellipse(0, -h * 0.14, w * 0.32, h * 0.28);
   } else if (type === 1) {
-    // BRODERIE -- points en croix reguliers
-    fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    stroke(accent);
-    strokeWeight(2 * energy);
-    for (let r = -2; r <= 2; r++) {
-      for (let c = -2; c <= 2; c++) {
-        let px = c * w * 0.2;
-        let py = r * h * 0.2;
-        line(px - w * 0.07, py, px + w * 0.07, py);
-        line(px, py - h * 0.07, px, py + h * 0.07);
-      }
-    }
-    noStroke();
-  } else if (type === 2) {
-    // TILE 4 PETALES -- motif geometrique andalou
+    // BRODERIE -- petit carre dans grand, point textile
     fill(col);
     rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    for (let a = 0; a < 4; a++) {
-      push();
-      rotate(a * HALF_PI);
-      ellipse(0, -h * 0.26, w * 0.28, h * 0.34);
-      pop();
-    }
+    rect(-w * 0.22, -h * 0.22, w * 0.28, h * 0.28);
+    rect(w * 0.22, h * 0.22, w * 0.28, h * 0.28);
     fill(col);
-    rect(0, 0, w * 0.22, h * 0.22);
-  } else {
-    // FONTAINE -- octogone + rayons
+    rect(-w * 0.22, -h * 0.22, w * 0.1, h * 0.1);
+    rect(w * 0.22, h * 0.22, w * 0.1, h * 0.1);
+  } else if (type === 2) {
+    // TILE -- octogone, carreau andalou
     fill(col);
     beginShape();
-    for (let a = 0; a < 8; a++) {
-      let ang = (a / 8) * TWO_PI - PI / 8;
-      vertex(cos(ang) * w * 0.42, sin(ang) * h * 0.42);
-    }
+    vertex(-w * 0.18, -h * 0.44);
+    vertex(w * 0.18, -h * 0.44);
+    vertex(w * 0.44, -h * 0.18);
+    vertex(w * 0.44, h * 0.18);
+    vertex(w * 0.18, h * 0.44);
+    vertex(-w * 0.18, h * 0.44);
+    vertex(-w * 0.44, h * 0.18);
+    vertex(-w * 0.44, -h * 0.18);
     endShape(CLOSE);
     fill(accent);
-    beginShape();
-    for (let a = 0; a < 8; a++) {
-      let ang = (a / 8) * TWO_PI - PI / 8;
-      vertex(cos(ang) * w * 0.22, sin(ang) * h * 0.22);
-    }
-    endShape(CLOSE);
-    stroke(col);
-    strokeWeight(1.2 * energy);
-    for (let a = 0; a < 8; a++) {
-      let ang = (a / 8) * TWO_PI;
-      line(0, 0, cos(ang) * w * 0.42, sin(ang) * h * 0.42);
-    }
-    noStroke();
+    ellipse(0, 0, w * 0.38, h * 0.38);
     fill(col);
-    ellipse(0, 0, w * 0.12, h * 0.12);
+    ellipse(0, 0, w * 0.14, h * 0.14);
+  } else {
+    // FONTAINE -- cercle dans carre, eau de la medina
+    fill(col);
+    rect(0, 0, w * 0.86, h * 0.86);
+    fill(accent);
+    ellipse(0, 0, w * 0.64, h * 0.64);
+    fill(col);
+    rect(0, 0, w * 0.22, h * 0.64);
+    rect(0, 0, w * 0.64, h * 0.22);
   }
   pop();
 }

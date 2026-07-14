@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS OUJDA
-// Bande sonore Gharnati, frontiere, compression chaleur, croix Reggada
+// Rythme oriental et chaleur : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawOujdaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -286,46 +286,49 @@ function drawOujdaMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // BANDE SONORE -- barres de hauteur variable, musique Gharnati
+    // GHARNATI -- bandes verticales, cordes de oud
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    for (let i = 0; i < 7; i++) {
-      let bx = map(i, 0, 6, -w * 0.36, w * 0.36);
-      let bh = (0.2 + 0.6 * abs(sin(i * 1.3 + frameCount * 0.04))) * h * energy;
-      rect(bx, 0, w * 0.07, bh);
-    }
+    rect(-w * 0.24, 0, w * 0.16, h * 0.76);
+    rect(0, 0, w * 0.16, h * 0.76);
+    rect(w * 0.24, 0, w * 0.16, h * 0.76);
+    fill(col);
+    rect(0, 0, w * 0.08, h * 0.08);
   } else if (type === 1) {
-    // FRONTIERE -- ligne verticale dure, deux zones
+    // FRONTIERE -- deux rectangles colles, partition
     fill(col);
-    rect(-w * 0.22, 0, w * 0.44, h * 0.88);
+    rect(-w * 0.22, 0, w * 0.42, h * 0.86);
     fill(accent);
-    rect(w * 0.22, 0, w * 0.44, h * 0.88);
+    rect(w * 0.22, 0, w * 0.42, h * 0.86);
     fill(col);
-    rect(0, 0, w * 0.04, h * 0.88);
-    fill(accent);
-    ellipse(0, 0, w * 0.14, h * 0.14);
+    ellipse(0, 0, w * 0.22, h * 0.22);
   } else if (type === 2) {
-    // COMPRESSION CHALEUR -- rectangles qui retrecissent vers centre
-    for (let i = 4; i >= 1; i--) {
-      fill(i % 2 === 0 ? col : accent);
-      rect(0, 0, w * 0.22 * i, h * 0.82);
-    }
-  } else {
-    // REGGADA -- croix diagonale rythmique
+    // BAB -- arc simple, porte de la vieille ville
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, h * 0.12, w * 0.72, h * 0.62);
     fill(accent);
-    push(); rotate(PI / 4);
-    rect(0, 0, w * 0.76, h * 0.14 * energy);
-    pop();
-    push(); rotate(-PI / 4);
-    rect(0, 0, w * 0.76, h * 0.14 * energy);
-    pop();
-    for (let i = -1; i <= 1; i += 2) {
-      fill(col);
-      ellipse(i * w * 0.3, i * h * 0.3, w * 0.12, h * 0.12);
-    }
+    ellipse(0, -h * 0.12, w * 0.72, h * 0.52);
+    fill(col);
+    rect(0, h * 0.24, w * 0.34, h * 0.38);
+  } else {
+    // CHALEUR -- losange compresse, pression continentale
+    fill(col);
+    rect(0, 0, w * 0.86, h * 0.86);
+    fill(accent);
+    beginShape();
+    vertex(0, -h * 0.42);
+    vertex(w * 0.28, 0);
+    vertex(0, h * 0.42);
+    vertex(-w * 0.28, 0);
+    endShape(CLOSE);
+    fill(col);
+    beginShape();
+    vertex(0, -h * 0.18);
+    vertex(w * 0.12, 0);
+    vertex(0, h * 0.18);
+    vertex(-w * 0.12, 0);
+    endShape(CLOSE);
   }
   pop();
 }

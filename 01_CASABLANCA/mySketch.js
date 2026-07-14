@@ -287,7 +287,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS CASABLANCA
-// Art deco, vagues atlantiques, grille urbaine, rosace Habous
+// Art deco atlantique : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -298,63 +298,46 @@ function drawCasaMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // ART DECO -- bandes verticales rythmees, facades Casablanca
+    // DECO STEP -- rectangles emboites decales
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    for (let i = -1; i <= 1; i++) {
-      rect(i * w * 0.28, 0, w * 0.1, h * 0.72);
-    }
+    rect(0, -h * 0.14, w * 0.56, h * 0.44);
     fill(col);
-    rect(0, 0, w * 0.08, h * 0.08);
+    rect(0, -h * 0.14, w * 0.22, h * 0.22);
   } else if (type === 1) {
-    // VAGUE ATLANTIQUE -- courbes sinusoidales superposees
+    // HUBLOT -- cercle dans carre, port atlantique
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    stroke(accent);
-    strokeWeight(1.5 * energy);
-    noFill();
-    for (let i = -1; i <= 1; i++) {
-      beginShape();
-      for (let t = -w * 0.42; t <= w * 0.42; t += 2) {
-        let sy = i * h * 0.18 + sin((t / w) * TWO_PI * 1.5) * h * 0.14 * energy;
-        vertex(t, sy);
-      }
-      endShape();
-    }
-    noStroke();
+    rect(0, 0, w * 0.86, h * 0.86);
+    fill(accent);
+    ellipse(0, 0, w * 0.58, h * 0.58);
+    fill(col);
+    ellipse(0, 0, w * 0.24, h * 0.24);
   } else if (type === 2) {
-    // ROSACE HABOUS -- hexagone + triangles rayonnants
+    // CHEVRON DECO -- fleche art deco vers le haut
     fill(col);
     beginShape();
-    for (let a = 0; a < 6; a++) {
-      let ang = (a / 6) * TWO_PI - PI / 6;
-      vertex(cos(ang) * w * 0.43, sin(ang) * h * 0.43);
-    }
+    vertex(0, -h * 0.44);
+    vertex(w * 0.44, h * 0.08);
+    vertex(w * 0.22, h * 0.08);
+    vertex(0, -h * 0.18);
+    vertex(-w * 0.22, h * 0.08);
+    vertex(-w * 0.44, h * 0.08);
     endShape(CLOSE);
     fill(accent);
-    for (let a = 0; a < 6; a++) {
-      let ang = (a / 6) * TWO_PI - PI / 6;
-      let nang = ((a + 1) / 6) * TWO_PI - PI / 6;
-      beginShape();
-      vertex(0, 0);
-      vertex(cos(ang) * w * 0.22, sin(ang) * h * 0.22);
-      vertex(cos((ang + nang) * 0.5) * w * 0.42, sin((ang + nang) * 0.5) * h * 0.42);
-      vertex(cos(nang) * w * 0.22, sin(nang) * h * 0.22);
-      endShape(CLOSE);
-    }
+    rect(0, h * 0.32, w * 0.66, h * 0.22);
+    fill(col);
+    rect(0, h * 0.32, w * 0.22, h * 0.22);
   } else {
-    // GRILLE URBAINE -- quadrillage, plan de ville
-    stroke(col);
-    strokeWeight(1.8 * energy);
-    let step = w * 0.22;
-    for (let i = -1; i <= 1; i++) {
-      line(i * step, -h * 0.42, i * step, h * 0.42);
-      line(-w * 0.42, i * step, w * 0.42, i * step);
-    }
-    noStroke();
+    // FENETRE HABOUS -- arc surbaisse
+    fill(col);
+    rect(0, h * 0.12, w * 0.72, h * 0.56);
+    fill(col);
+    ellipse(0, -h * 0.16, w * 0.72, h * 0.52);
     fill(accent);
-    rect(0, 0, w * 0.12, h * 0.12);
+    rect(0, h * 0.12, w * 0.42, h * 0.36);
+    fill(palette.cyan);
+    ellipse(0, -h * 0.16, w * 0.42, h * 0.3);
   }
   pop();
 }

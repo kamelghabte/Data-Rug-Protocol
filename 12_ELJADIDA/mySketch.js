@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS EL JADIDA
-// Voute croisee citerne, bastion portugais, reflet eau, meurtriere
+// Citerne et bastions : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawElJadidaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -286,55 +286,47 @@ function drawElJadidaMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // VOUTE CROISEE -- deux arches qui se coupent, citerne
+    // VOUTE -- double arc, citerne gothique
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    arc(0, h * 0.22, w * 0.72, h * 0.68, PI, TWO_PI);
-    arc(0, -h * 0.22, w * 0.72, h * 0.68, 0, PI);
+    ellipse(0, -h * 0.14, w * 0.72, h * 0.56);
+    ellipse(0, h * 0.14, w * 0.72, h * 0.56);
     fill(col);
-    ellipse(0, 0, w * 0.18, h * 0.18);
+    ellipse(0, 0, w * 0.24, h * 0.24);
   } else if (type === 1) {
-    // BASTION PORTUGAIS -- pentagone fortifie
+    // BASTION -- pentagone, fortification portugaise
     fill(col);
     beginShape();
     vertex(0, -h * 0.44);
-    vertex(w * 0.44, -h * 0.14);
+    vertex(w * 0.44, -h * 0.1);
     vertex(w * 0.28, h * 0.44);
     vertex(-w * 0.28, h * 0.44);
-    vertex(-w * 0.44, -h * 0.14);
+    vertex(-w * 0.44, -h * 0.1);
     endShape(CLOSE);
     fill(accent);
-    beginShape();
-    vertex(0, -h * 0.22);
-    vertex(w * 0.22, -h * 0.07);
-    vertex(w * 0.14, h * 0.22);
-    vertex(-w * 0.14, h * 0.22);
-    vertex(-w * 0.22, -h * 0.07);
-    endShape(CLOSE);
+    ellipse(0, h * 0.06, w * 0.36, h * 0.36);
     fill(col);
-    ellipse(0, 0, w * 0.12, h * 0.12);
+    ellipse(0, h * 0.06, w * 0.14, h * 0.14);
   } else if (type === 2) {
-    // REFLET D EAU -- ellipses symetriques, miroir
+    // REFLET -- demi haut + demi bas, miroir eau
     fill(col);
-    ellipse(0, -h * 0.18, w * 0.72, h * 0.44);
+    rect(0, -h * 0.22, w * 0.86, h * 0.42);
     fill(accent);
-    ellipse(0, h * 0.18, w * 0.72, h * 0.44);
-    stroke(col);
-    strokeWeight(2 * energy);
-    line(-w * 0.36, 0, w * 0.36, 0);
-    noStroke();
+    rect(0, h * 0.22, w * 0.86, h * 0.42);
     fill(col);
-    ellipse(0, 0, w * 0.1, h * 0.1);
+    rect(0, 0, w * 0.86, h * 0.08);
+    fill(accent);
+    ellipse(0, 0, w * 0.14, h * 0.14);
   } else {
-    // MEURTRIERE -- fente verticale dans mur epais
+    // MEURTRIERE -- rectangle etroit vertical dans carre
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    rect(0, 0, w * 0.12, h * 0.72);
-    rect(0, 0, w * 0.44, h * 0.1);
+    rect(0, 0, w * 0.14, h * 0.72);
     fill(col);
-    rect(0, 0, w * 0.04, h * 0.54);
+    rect(0, -h * 0.28, w * 0.36, h * 0.12);
+    rect(0, h * 0.28, w * 0.36, h * 0.12);
   }
   pop();
 }

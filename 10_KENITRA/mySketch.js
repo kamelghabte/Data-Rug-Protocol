@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS KENITRA
-// Anneaux de croissance, veines de liege, meandre Sebou, foret
+// Foret et fleuve : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawKenitraMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -286,56 +286,41 @@ function drawKenitraMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // ANNEAUX DE CROISSANCE -- ellipses concentriques
-    for (let i = 4; i >= 1; i--) {
-      fill(i % 2 === 0 ? col : accent);
-      ellipse(i * 0.04 * w * energy, 0, w * 0.2 * i, h * 0.22 * i);
-    }
+    // FEUILLE -- ovale + tige, foret de Maamora
+    fill(col);
+    ellipse(0, -h * 0.08, w * 0.56, h * 0.72);
+    fill(accent);
+    rect(0, h * 0.28, w * 0.08, h * 0.3);
+    fill(col);
+    ellipse(0, -h * 0.08, w * 0.2, h * 0.28);
   } else if (type === 1) {
-    // VEINES DE LIEGE -- lignes ondulees paralleles
+    // LIEGE -- carre arrondi dans carre, ecorce
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    stroke(accent);
-    strokeWeight(1.6 * energy);
-    noFill();
-    for (let i = -3; i <= 3; i++) {
-      beginShape();
-      for (let t = -w * 0.42; t <= w * 0.42; t += 2) {
-        vertex(t, i * h * 0.14 + sin((t / w) * PI * 2 + i) * h * 0.06);
-      }
-      endShape();
-    }
-    noStroke();
+    rect(0, 0, w * 0.86, h * 0.86);
+    fill(accent);
+    rect(0, 0, w * 0.58, h * 0.58, w * 0.14);
+    fill(col);
+    rect(0, 0, w * 0.28, h * 0.28, w * 0.08);
   } else if (type === 2) {
-    // MEANDRE SEBOU -- courbe sinueuse du fleuve
+    // SEBOU -- bande sinueuse, S du fleuve
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    beginShape();
-    vertex(-w * 0.44, -h * 0.44);
-    bezierVertex(-w * 0.44, h * 0.1, -w * 0.1, -h * 0.1, 0, 0);
-    bezierVertex(w * 0.1, h * 0.1, w * 0.44, -h * 0.1, w * 0.44, h * 0.44);
-    vertex(w * 0.44, h * 0.44);
-    bezierVertex(w * 0.44, h * 0.2, w * 0.2, h * 0.08, 0, h * 0.18);
-    bezierVertex(-w * 0.2, h * 0.28, -w * 0.44, h * 0.22, -w * 0.44, -h * 0.44);
-    endShape(CLOSE);
+    ellipse(-w * 0.14, -h * 0.2, w * 0.48, h * 0.42);
+    ellipse(w * 0.14, h * 0.2, w * 0.48, h * 0.42);
+    fill(col);
+    ellipse(-w * 0.14, -h * 0.2, w * 0.22, h * 0.18);
+    ellipse(w * 0.14, h * 0.2, w * 0.22, h * 0.18);
   } else {
-    // FORET MAAMORA -- arbres en rangee
+    // ANNEAU -- double anneau, bois coupe
     fill(col);
-    rect(0, h * 0.28, w * 0.88, h * 0.22);
+    ellipse(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    for (let i = -2; i <= 2; i++) {
-      push();
-      translate(i * w * 0.2, 0);
-      beginShape();
-      vertex(0, -h * 0.42);
-      vertex(w * 0.14, h * 0.14);
-      vertex(-w * 0.14, h * 0.14);
-      endShape(CLOSE);
-      fill(col);
-      rect(0, h * 0.22, w * 0.06, h * 0.18);
-      pop();
-    }
+    ellipse(0, 0, w * 0.58, h * 0.58);
+    fill(col);
+    ellipse(0, 0, w * 0.34, h * 0.34);
+    fill(accent);
+    ellipse(0, 0, w * 0.14, h * 0.14);
   }
   pop();
 }

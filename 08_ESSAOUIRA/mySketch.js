@@ -277,7 +277,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS ESSAOUIRA
-// Filet de vent, noeud marin spirale, vague suspendue, bastion
+// Vent et mer : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawEssaouiraMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -288,56 +288,45 @@ function drawEssaouiraMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // FILET DE VENT -- maille losange, filets de peche
+    // REMPART MOGADOR -- carre + demi-cercles aux cotes
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    stroke(accent);
-    strokeWeight(1.4 * energy);
-    let step = w * 0.22;
-    for (let i = -2; i <= 2; i++) {
-      line(i * step - w * 0.44, -h * 0.44, i * step + w * 0.44, h * 0.44);
-      line(i * step + w * 0.44, -h * 0.44, i * step - w * 0.44, h * 0.44);
-    }
-    noStroke();
+    rect(0, 0, w * 0.58, h * 0.58);
     fill(accent);
-    ellipse(0, 0, w * 0.1, h * 0.1);
+    ellipse(-w * 0.29, 0, w * 0.34, h * 0.34);
+    ellipse(w * 0.29, 0, w * 0.34, h * 0.34);
+    fill(col);
+    ellipse(0, 0, w * 0.2, h * 0.2);
   } else if (type === 1) {
-    // NOEUD MARIN -- spirale serree, cordage
-    stroke(col);
-    strokeWeight(3 * energy);
-    noFill();
+    // VENT -- fleche horizontale, alizes permanents
+    fill(col);
     beginShape();
-    for (let a = 0; a < TWO_PI * 3; a += 0.1) {
-      let r = a / (TWO_PI * 3) * w * 0.4;
-      vertex(cos(a) * r, sin(a) * r);
-    }
-    endShape();
-    noStroke();
+    vertex(-w * 0.44, -h * 0.18);
+    vertex(w * 0.22, -h * 0.18);
+    vertex(w * 0.44, 0);
+    vertex(w * 0.22, h * 0.18);
+    vertex(-w * 0.44, h * 0.18);
+    endShape(CLOSE);
     fill(accent);
-    ellipse(0, 0, w * 0.12, h * 0.12);
+    rect(-w * 0.08, 0, w * 0.44, h * 0.14);
+    fill(palette.sable);
+    ellipse(w * 0.22, 0, w * 0.12, h * 0.12);
   } else if (type === 2) {
-    // VAGUE SUSPENDUE -- arcs ouverts, vent permanent
+    // THUYA -- ovale vertical, bois precieux
     fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    stroke(accent);
-    strokeWeight(2.2 * energy);
-    noFill();
-    for (let i = -1; i <= 1; i++) {
-      arc(0, i * h * 0.2, w * 0.68, h * 0.48, PI, TWO_PI);
-    }
-    noStroke();
-  } else {
-    // PORT MOGADOR -- bastion carre + tours rondes aux coins
-    fill(col);
-    rect(0, 0, w * 0.64, h * 0.64);
+    ellipse(0, 0, w * 0.54, h * 0.86);
     fill(accent);
-    for (let dx = -1; dx <= 1; dx += 2) {
-      for (let dy = -1; dy <= 1; dy += 2) {
-        ellipse(dx * w * 0.32, dy * h * 0.32, w * 0.22, h * 0.22);
-      }
-    }
+    ellipse(0, 0, w * 0.3, h * 0.56);
     fill(col);
-    rect(0, 0, w * 0.28, h * 0.28);
+    ellipse(0, 0, w * 0.12, h * 0.22);
+  } else {
+    // GNAOUA -- cercle + croix, rythme sacre
+    fill(col);
+    ellipse(0, 0, w * 0.86, h * 0.86);
+    fill(accent);
+    rect(0, 0, w * 0.22, h * 0.72);
+    rect(0, 0, w * 0.72, h * 0.22);
+    fill(col);
+    ellipse(0, 0, w * 0.24, h * 0.24);
   }
   pop();
 }

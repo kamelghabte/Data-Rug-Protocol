@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS MEKNES
-// Bab Mansour, olive, symetrie imperiale, mosaique Volubilis
+// Imperial et monumental : formes pleines, 3 couches max
 // --------------------------------------------------
 function drawMeknesMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -286,65 +286,61 @@ function drawMeknesMotif(x, y, w, h, type, col, accent, rot, energy) {
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
   if (type === 0) {
-    // BAB MANSOUR -- grande porte, deux pilastres
+    // BAB MANSOUR -- arc + deux colonnes
     fill(col);
-    rect(0, h * 0.08, w * 0.88, h * 0.72);
+    rect(-w * 0.32, 0, w * 0.18, h * 0.86);
+    rect(w * 0.32, 0, w * 0.18, h * 0.86);
     fill(accent);
-    rect(-w * 0.28, h * 0.08, w * 0.2, h * 0.72);
-    rect(w * 0.28, h * 0.08, w * 0.2, h * 0.72);
+    beginShape();
+    vertex(-w * 0.22, h * 0.12);
+    vertex(-w * 0.22, -h * 0.12);
+    bezierVertex(-w * 0.22, -h * 0.44, w * 0.22, -h * 0.44, w * 0.22, -h * 0.12);
+    vertex(w * 0.22, h * 0.12);
+    endShape(CLOSE);
+    fill(col);
+    rect(0, h * 0.12, w * 0.44, h * 0.08);
+  } else if (type === 1) {
+    // OLIVE -- ellipse verticale etiree, fruit olive
+    fill(col);
+    ellipse(0, 0, w * 0.48, h * 0.82);
+    fill(accent);
+    ellipse(0, -h * 0.12, w * 0.28, h * 0.36);
+    fill(col);
+    ellipse(0, h * 0.14, w * 0.14, h * 0.14);
+  } else if (type === 2) {
+    // VOLUBILIS -- rectangle + triangle, colonne romaine
+    fill(col);
+    rect(0, h * 0.08, w * 0.34, h * 0.62);
+    fill(accent);
+    beginShape();
+    vertex(-w * 0.28, -h * 0.18);
+    vertex(w * 0.28, -h * 0.18);
+    vertex(0, -h * 0.44);
+    endShape(CLOSE);
+    fill(col);
+    rect(0, -h * 0.18, w * 0.48, h * 0.1);
+  } else {
+    // IMPERIAL -- hexagone, sceau royal
     fill(col);
     beginShape();
-    vertex(-w * 0.22, -h * 0.2);
-    vertex(-w * 0.22, -h * 0.36);
-    bezierVertex(-w * 0.22, -h * 0.5, w * 0.22, -h * 0.5, w * 0.22, -h * 0.36);
-    vertex(w * 0.22, -h * 0.2);
+    vertex(0, -h * 0.44);
+    vertex(w * 0.38, -h * 0.22);
+    vertex(w * 0.38, h * 0.22);
+    vertex(0, h * 0.44);
+    vertex(-w * 0.38, h * 0.22);
+    vertex(-w * 0.38, -h * 0.22);
     endShape(CLOSE);
     fill(accent);
-    rect(0, -h * 0.2, w * 0.44, h * 0.06);
-  } else if (type === 1) {
-    // OLIVE -- ellipse + feuilles
+    beginShape();
+    vertex(0, -h * 0.22);
+    vertex(w * 0.19, -h * 0.11);
+    vertex(w * 0.19, h * 0.11);
+    vertex(0, h * 0.22);
+    vertex(-w * 0.19, h * 0.11);
+    vertex(-w * 0.19, -h * 0.11);
+    endShape(CLOSE);
     fill(col);
-    ellipse(0, 0, w * 0.44, h * 0.72);
-    fill(accent);
-    push(); rotate(PI / 5);
-    ellipse(0, -h * 0.22, w * 0.26, h * 0.14);
-    pop();
-    push(); rotate(-PI / 5);
-    ellipse(0, -h * 0.22, w * 0.26, h * 0.14);
-    pop();
-    fill(col);
-    ellipse(0, h * 0.08, w * 0.1, h * 0.1);
-  } else if (type === 2) {
-    // SYMETRIE IMPERIALE -- axe central, miroir parfait
-    fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    fill(accent);
-    rect(0, 0, w * 0.06, h * 0.88);
-    for (let i = 1; i <= 3; i++) {
-      fill(i % 2 === 0 ? col : accent);
-      rect(-w * 0.3, -h * 0.38 + i * h * 0.2, w * 0.24, h * 0.1);
-      rect(w * 0.3, -h * 0.38 + i * h * 0.2, w * 0.24, h * 0.1);
-    }
-  } else {
-    // VOLUBILIS -- mosaique hexagonale romaine
-    fill(col);
-    rect(0, 0, w * 0.88, h * 0.88);
-    fill(accent);
-    for (let r = -1; r <= 1; r++) {
-      for (let c = -1; c <= 1; c++) {
-        if ((r + c) % 2 === 0) {
-          push();
-          translate(c * w * 0.28, r * h * 0.28);
-          beginShape();
-          for (let a = 0; a < 6; a++) {
-            let ang = (a / 6) * TWO_PI;
-            vertex(cos(ang) * w * 0.12, sin(ang) * h * 0.12);
-          }
-          endShape(CLOSE);
-          pop();
-        }
-      }
-    }
+    ellipse(0, 0, w * 0.14, h * 0.14);
   }
   pop();
 }
