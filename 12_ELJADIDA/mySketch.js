@@ -122,7 +122,7 @@ function weatherError(err) {
 // 6) DRAW
 // --------------------------------------------------
 function draw() {
-  background(palette.noir);
+  background(palette.nuit);
   image(textureLayer, 0, 0);
 
   push();
