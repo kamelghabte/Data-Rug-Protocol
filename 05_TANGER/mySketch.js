@@ -1,476 +1,614 @@
-// DATA RUG PROTOCOL // 05 TANGER
-// STRAIT SIGNAL — Détroit / Entre Deux Mers
-// Artiste : Kamel Ghabte
-// Commission : Institut Français du Maroc (IFM)
+// ════════════════════════════════════════════════════════════════
+//  TANGER ZELLIGE  —  Weather Weaving
+//  Institut Français du Maroc · Œuvre 05
+// ════════════════════════════════════════════════════════════════
+//  5 curseurs simultanés · marée atlantique · erosion du joint ·
+//  mode nuit Casablanca · brume chbab · dawwama rayonnante
+// ════════════════════════════════════════════════════════════════
 
-// --------------------------------------------------
-// 1) CONFIG API
-// --------------------------------------------------
 let apiKey = "2f05fef27241392f92f3b94a0d889ff0";
-let city = "Tangier,MA";
-let weatherData = null;
+let city   = "Tangier,MA";
 
-let temp = 21;
-let humidity = 72;
-let wind = 8;
-let description = "STRAIT SIGNAL...";
+let temp        = 20;
+let humidity    = 65;
+let wind        = 4;
+let description = "LOADING DATA...";
 
-// --------------------------------------------------
-// 2) MÉTIER À TISSER
-// --------------------------------------------------
+// ─── GRILLE ────────────────────────────────────────────────────
 let loomGrid = [];
-let cols = 12;
-let rows = 14;
+let cols = 18;
+let rows = 22;
 let cellW, cellH;
-let weaveCursor = 0;
+
+// ─── 5 CURSEURS — chacun a sa propre trajectoire ───────────────
+// Ils coexistent comme 5 artisans zellij sur un même chantier
+let cursors = [
+  { pos: 0,            dir: 1,   speed: 1,   type: "SNAKE"    }, // serpente ligne/ligne
+  { pos: 0,            dir: 1,   speed: 2,   type: "DIAGONAL" }, // vagues diagonales
+  { pos: 0,            dir: -1,  speed: 1,   type: "REVERSE"  }, // remonte depuis la fin
+  { pos: 0,            dir: 1,   speed: 3,   type: "SKIP"     }, // saute de 3 cases
+  { pos: 0,            dir: 1,   speed: 1,   type: "SPIRAL"   }, // spirale depuis le centre
+];
+
+// Ordres de parcours précalculés
+let orderSnake    = [];
+let orderDiag     = [];
+let orderSpiral   = [];
+
+let generation    = 0;
+let lastPlaced    = [];   // indices des 5 dernières tuiles posées (un par curseur)
+let tidePhase     = 0;    // oscillation lente — marée atlantique
+
+// ─── PALETTES ──────────────────────────────────────────────────
+// Palette JOUR — lumière méditerranéenne sur le blanc de Casablanca
+let palDay = [
+  '#1F3A5F',
+  '#2E86C1',
+  '#AED6F1',
+  '#FDFEFE',
+  '#5D6D7E',
+  '#2C3E50',
+  '#85C1E9',
+  '#0A0A14',
+];
+
+// Palette NUIT — Casablanca après 21h : indigo, or, brume bleue
+let palNight = [
+  '#04081A',
+  '#0A1430',
+  '#142248',
+  '#1A3060',
+  '#5D6D7E',
+  '#2C3E50',
+  '#D6EAF8',
+  '#06080E',
+];
+
+// Palette TEMPÊTE — quand le vent dépasse 12 m/s
+let palStorm = [
+  '#04060E',
+  '#0A1018',
+  '#141A28',
+  '#1A2438',
+  '#989898',
+  '#686868',
+  '#283040',
+  '#040608',
+];
+
+// ─── LAYOUT ────────────────────────────────────────────────────
+let margin       = 80;
+let bottomMargin = 180;
+
+// ─── MIDI ──────────────────────────────────────────────────────
+let midiAccess     = null;
 let lastActionTime = 0;
-let pendingExport = false;
 
-// --------------------------------------------------
-// 3) PALETTE TANGER
-// Bleu Atlantique · Bleu Méditerranée · Brume · Horizon · Nuit
-// --------------------------------------------------
-let palette = {
-  atlantique:    "#1F3A5F",
-  mediterranee: "#2E86C1",
-  brume:        "#AED6F1",
-  horizon:      "#FDFEFE",
-  nuit:         "#0A0A14",
-  acier:        "#5D6D7E",
-  ecume:        "#D6EAF8"
-};
+// ─── HEURE LOCALE CASABLANCA ───────────────────────────────────
+function isNightInTANGER() {
+  // UTC+1 (Maroc heure standard) / UTC+0 hiver
+  let h = (new Date().getUTCHours() + 1) % 24;
+  return h >= 21 || h < 6;
+}
 
-let margin = 84;
-let bottomMargin = 170;
-let textureLayer;
-
-// --------------------------------------------------
-// 4) SETUP
-// --------------------------------------------------
+// ───────────────────────────────────────────────────────────────
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  rectMode(CENTER);
   noStroke();
-
+  recalcGrid();
+  buildOrders();
   initGrid();
-  buildTextureLayer();
+
+  // Curseurs initialisés à des positions distribuées
+  cursors[0].pos = 0;
+  cursors[1].pos = 0;
+  cursors[2].pos = cols * rows - 1;
+  cursors[3].pos = floor(cols * rows / 3);
+  cursors[4].pos = 0;
 
   loadJSON(
     `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`,
-    gotWeather,
-    weatherError
+    gotWeather
   );
+
+  if (navigator.requestMIDIAccess) {
+    navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+  }
+}
+
+function recalcGrid() {
+  cellW = (width  - margin * 2) / cols;
+  cellH = (height - margin - bottomMargin) / rows;
+}
+
+// Construction des 3 ordres de parcours
+function buildOrders() {
+  // SNAKE — ligne par ligne, sens alternés
+  orderSnake = [];
+  for (let r = 0; r < rows; r++) {
+    let row = [];
+    for (let c = 0; c < cols; c++) row.push(c + r * cols);
+    if (r % 2 !== 0) row.reverse();
+    orderSnake = orderSnake.concat(row);
+  }
+
+  // DIAGONAL — vagues ↘↗ alternées
+  orderDiag = [];
+  let numD = cols + rows - 1;
+  for (let d = 0; d < numD; d++) {
+    let wave = [];
+    for (let c = max(0, d-(rows-1)); c <= min(d, cols-1); c++) {
+      wave.push(c + (d-c)*cols);
+    }
+    if (d % 2 !== 0) wave.reverse();
+    orderDiag = orderDiag.concat(wave);
+  }
+
+  // SPIRAL — depuis les bords vers le centre
+  orderSpiral = [];
+  let t=0, b=rows-1, l=0, r2=cols-1;
+  while (t<=b && l<=r2) {
+    for (let c=l; c<=r2; c++) orderSpiral.push(c + t*cols);
+    t++;
+    for (let row=t; row<=b; row++) orderSpiral.push(r2 + row*cols);
+    r2--;
+    if (t<=b) { for (let c=r2; c>=l; c--) orderSpiral.push(c + b*cols); b--; }
+    if (l<=r2) { for (let row=b; row>=t; row--) orderSpiral.push(l + row*cols); l++; }
+  }
 }
 
 function initGrid() {
-  let drawW = width - margin * 2;
-  let drawH = height - margin - bottomMargin;
-  cellW = drawW / cols;
-  cellH = drawH / rows;
-
   loomGrid = [];
   for (let i = 0; i < cols * rows; i++) {
     loomGrid.push({
       type:   0,
-      col:    palette.nuit,
-      accent: palette.mediterranee,
-      rot:    0,
+      col:    '#092E7A',
       active: false,
-      energy: 0
+      age:    0,        // âge en cycles (max 4)
+      born:   0,        // millis() quand posée — pour fade-in
     });
   }
 }
 
-function buildTextureLayer() {
-  textureLayer = createGraphics(width, height);
-  textureLayer.clear();
-  textureLayer.noStroke();
-
-  for (let i = 0; i < width * height * 0.0009; i++) {
-    let x = random(width);
-    let y = random(height);
-    let a = random(4, 14);
-    textureLayer.fill(46, 134, 193, a);
-    textureLayer.circle(x, y, random(0.3, 1.0));
-  }
-
-  for (let i = 0; i < 100; i++) {
-    textureLayer.stroke(174, 214, 241, 5);
-    let y = random(height);
-    textureLayer.line(0, y, width, y + random(-2, 2));
-  }
-}
-
-// --------------------------------------------------
-// 5) MÉTÉO
-// --------------------------------------------------
 function gotWeather(data) {
-  if (!data || !data.main || !data.weather || !data.wind) return;
-  weatherData = data;
   temp        = data.main.temp;
   humidity    = data.main.humidity;
   wind        = data.wind.speed;
   description = data.weather[0].description.toUpperCase();
 }
 
-function weatherError(err) {
-  console.log("Weather API error", err);
-  description = "LOCAL MEMORY MODE";
+function onMIDISuccess(midi) {
+  midiAccess = midi;
+  for (let input of midiAccess.inputs.values()) {
+    input.onmidimessage = handleMIDIMessage;
+  }
+}
+function onMIDIFailure() {}
+
+function handleMIDIMessage(message) {
+  const d = message.data;
+  if (d[0] === 144 && d.length > 2 && d[2] > 0) {
+    // Vélocité forte = tous les curseurs activés d'un coup
+    let burst = d[2] > 100 ? cursors.length : 1;
+    for (let b = 0; b < burst; b++) weaveAll(d[2]);
+    lastActionTime = millis();
+  }
 }
 
-// --------------------------------------------------
-// 6) DRAW
-// --------------------------------------------------
+// ─── DRAW ───────────────────────────────────────────────────────
 function draw() {
-  background(palette.nuit);
-  image(textureLayer, 0, 0);
 
-  push();
-  translate(margin, margin);
-  drawGridThreads();
-  drawCells();
-  drawWeaveCursor();
-  pop();
+  // Fond respirant — la marée change l'intensité du fond
+  tidePhase += 0.004;
+  let tide = map(sin(tidePhase), -1, 1, 0, 8);
+  background(8 + tide, 12 + tide, 28 + tide * 2);
 
-  drawMuseumFrame();
-  drawHUD();
-
-  if (pendingExport) {
-    pendingExport = false;
-    noLoop();
-    let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
-    saveCanvas(`DATA_RUG_IFM_05_TANGER_KAMEL_GHABTE_${ts}`, 'png');
-    setTimeout(() => {
-      for (let c of loomGrid) c.active = false;
-      weaveCursor = 0;
-      lastActionTime = millis();
-      loop();
-    }, 200);
-    return;
-  }
-
-  let autoSpeed = map(constrain(wind, 0, 20), 0, 20, 1000, 150);
+  // AUTO-PILOT — vitesse ← vent
+  // Vent fort = urgence du chantier, toutes les mains travaillent vite
+  let autoSpeed = map(wind, 0, 20, 980, 80);
   if (millis() - lastActionTime > autoSpeed) {
-    autoWeave();
+    weaveAll(random(55, 100));
     lastActionTime = millis();
   }
 
-  if (mouseIsPressed && frameCount % 4 === 0) {
-    autoWeave();
-  }
-}
+  push();
+  translate(margin, margin);
 
-// --------------------------------------------------
-// 7) TRAME / GRILLE
-// --------------------------------------------------
-function drawGridThreads() {
-  stroke(46, 134, 193, 16);
-  strokeWeight(0.5);
-  for (let c = 0; c <= cols; c++) {
-    let x = c * cellW;
-    line(x, 0, x, rows * cellH);
-  }
-  for (let r = 0; r <= rows; r++) {
-    let y = r * cellH;
-    line(0, y, cols * cellW, y);
-  }
-
-  stroke(255, 28);
-  for (let c = 0; c < cols; c++) {
-    let x = c * cellW + cellW * 0.5;
-    line(x, 0, x, rows * cellH);
-  }
-  noStroke();
-}
-
-function drawCells() {
+  // ── DESSIN DE LA GRILLE ──
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      let index = c + r * cols;
-      let cell  = loomGrid[index];
-      let x     = c * cellW + cellW * 0.5;
-      let y     = r * cellH + cellH * 0.5;
-
-      let pulse  = sin(frameCount * 0.02 + index * 0.14) * 0.5 + 0.5;
-      let energy = cell.energy * (0.75 + pulse * 0.25);
+      let idx  = c + r * cols;
+      let cell = loomGrid[idx];
+      let x = c * cellW;
+      let y = r * cellH;
 
       if (cell.active) {
-        drawTangerMotif(x, y, cellW * 0.86, cellH * 0.86, cell.type, cell.col, cell.accent, cell.rot, energy);
-        cell.energy = lerp(cell.energy, 0.12, 0.05);
+
+        // Fade-in à la pose — la tuile "arrive" en 300ms
+        let elapsed = millis() - cell.born;
+        let fadeIn  = min(1.0, elapsed / 300.0);
+
+        // Erosion du joint avec l'âge — le mortier sèche, le joint s'élargit
+        // Génération 0 : tuile pleine · Génération 3 : tuile réduite de 4px
+        let grout = cell.age * 1.2;
+        let tx = x + grout;
+        let ty = y + grout;
+        let tw = (cellW - grout * 2) * fadeIn;
+        let th = (cellH - grout * 2) * fadeIn;
+
+        // Vague de marée atlantique — très légère ondulation verticale par colonne
+        // Les colonnes paires et impaires oscillent en opposition de phase
+        let tideShift = sin(tidePhase + c * 0.4) * 1.2;
+        ty += tideShift;
+
+        if (tw > 0 && th > 0) {
+          drawZelligeMotif(tx, ty, tw, th, cell.type, cell.col);
+        }
+
       } else {
-        fill(46, 134, 193, 6);
-        rect(x, y, cellW * 0.07, cellH * 0.07, 2);
+        // Trame vide — petit losange de tracé, comme le tesserae brut non posé
+        stroke(18, 28, 55); strokeWeight(0.4);
+        let pcx = x + cellW/2;
+        let pcy = y + cellH/2;
+        let ps  = 2.8;
+        line(pcx-ps, pcy, pcx, pcy-ps);
+        line(pcx, pcy-ps, pcx+ps, pcy);
+        line(pcx+ps, pcy, pcx, pcy+ps);
+        line(pcx, pcy+ps, pcx-ps, pcy);
+        noStroke();
       }
     }
   }
-}
 
-function drawWeaveCursor() {
-  let cursorIndex = weaveCursor % (cols * rows);
-  let cursorRow   = floor(cursorIndex / cols);
-  let cursorCol   = cursorIndex % cols;
+  // ── 5 NAVETTES — une par curseur, chacune avec sa signature ──
+  let navStyles = [
+    { col: '#C8A65A', w: 1.5, dash: [4, 6]  },  // Snake — or
+    { col: '#2A9CC8', w: 1.0, dash: [2, 8]  },  // Diagonal — turquoise
+    { col: '#B83A0A', w: 0.8, dash: [1, 10] },  // Reverse — terracotta
+    { col: '#EFE8D8', w: 0.6, dash: [6, 4]  },  // Skip — blanc plâtre
+    { col: '#2C5840', w: 0.8, dash: [3, 7]  },  // Spiral — vert menthe
+  ];
 
-  let y = cursorRow * cellH + cellH * 0.5;
-  let x = cursorCol * cellW + cellW * 0.5;
+  for (let ci = 0; ci < cursors.length; ci++) {
+    let cur   = cursors[ci];
+    let order = getOrder(cur.type);
+    let pos   = cur.pos % order.length;
+    let idx   = order[pos];
+    let cr    = floor(idx / cols);
+    let curY  = cr * cellH + cellH;
+    let ns    = navStyles[ci];
 
-  stroke(palette.brume);
-  strokeWeight(1.4);
-  line(0, y, cols * cellW, y);
-
-  noFill();
-  stroke(palette.horizon);
-  strokeWeight(0.8);
-  rect(x, y, cellW * 0.88, cellH * 0.88);
-  noStroke();
-}
-
-// --------------------------------------------------
-// 8) LOGIQUE DE COULEUR
-// --------------------------------------------------
-function pickColor() {
-  if (temp <= 16) {
-    return random([palette.atlantique, palette.acier, palette.nuit]);
-  }
-  if (temp >= 28) {
-    return random([palette.brume, palette.horizon, palette.ecume]);
-  }
-  return random([palette.atlantique, palette.mediterranee, palette.brume, palette.acier]);
-}
-
-function pickAccent(baseCol) {
-  if (baseCol === palette.atlantique || baseCol === palette.nuit) return palette.brume;
-  if (baseCol === palette.brume || baseCol === palette.ecume) return palette.atlantique;
-  return palette.horizon;
-}
-
-// --------------------------------------------------
-// 9) TISSAGE
-// --------------------------------------------------
-function weavePattern(velocity) {
-  let index = weaveCursor % (cols * rows);
-
-  // Dernier motif posé → flag export
-  if (index === cols * rows - 1) {
-    pendingExport = true;
+    stroke(ns.col); strokeWeight(ns.w);
+    drawingContext.setLineDash(ns.dash);
+    line(0, curY, width - margin*2, curY);
+    drawingContext.setLineDash([]);
+    noStroke();
   }
 
-  let complexity = floor(map(constrain(humidity, 30, 100), 30, 100, 1, 4));
-  let pool = wind > 10 ? [1, 3, 1, 3, 2] : Array.from({length: complexity + 1}, (_, i) => i);
-  let motif = random(pool);
-
-  loomGrid[index].type   = motif;
-  loomGrid[index].col    = pickColor();
-  loomGrid[index].accent = pickAccent(loomGrid[index].col);
-  loomGrid[index].rot    = floor(random(4)) * HALF_PI;
-  loomGrid[index].active = true;
-  loomGrid[index].energy = map(constrain(velocity, 1, 127), 1, 127, 0.35, 1);
-
-  weaveCursor++;
-}
-
-function autoWeave() {
-  let ghostVelocity = map(constrain(wind + humidity * 0.03, 0, 14), 0, 14, 34, 96);
-  weavePattern(ghostVelocity);
-}
-
-// --------------------------------------------------
-// 10) MOTIFS TANGER
-// Detroit et horizons : formes pleines, 3 couches max
-// --------------------------------------------------
-function drawTangerMotif(x, y, w, h, type, col, accent, rot, energy) {
-  push();
-  translate(x, y);
-  rotate(rot);
-  rectMode(CENTER);
-  noStroke();
-  let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
-  scale(breath);
-  if (type === 0) {
-    // DETROIT -- triangle pointe, deux mers convergent
-    fill(col);
-    beginShape();
-    vertex(0, -h * 0.44);
-    vertex(w * 0.44, h * 0.44);
-    vertex(-w * 0.44, h * 0.44);
-    endShape(CLOSE);
-    fill(accent);
-    beginShape();
-    vertex(0, -h * 0.14);
-    vertex(w * 0.22, h * 0.28);
-    vertex(-w * 0.22, h * 0.28);
-    endShape(CLOSE);
-    fill(palette.horizon);
-    ellipse(0, h * 0.08, w * 0.12, h * 0.12);
-  } else if (type === 1) {
-    // HORIZON -- demi-cercle, ligne de mer
-    fill(col);
-    rect(0, 0, w * 0.86, h * 0.86);
-    fill(accent);
-    arc(0, h * 0.06, w * 0.76, h * 0.76, PI, TWO_PI);
-    fill(palette.brume);
-    rect(0, h * 0.06, w * 0.76, h * 0.08);
-  } else if (type === 2) {
-    // PORT -- losange, croisement de routes maritimes
-    fill(col);
-    beginShape();
-    vertex(0, -h * 0.44);
-    vertex(w * 0.44, 0);
-    vertex(0, h * 0.44);
-    vertex(-w * 0.44, 0);
-    endShape(CLOSE);
-    fill(accent);
-    beginShape();
-    vertex(0, -h * 0.2);
-    vertex(w * 0.2, 0);
-    vertex(0, h * 0.2);
-    vertex(-w * 0.2, 0);
-    endShape(CLOSE);
-    fill(palette.horizon);
-    ellipse(0, 0, w * 0.1, h * 0.1);
-  } else {
-    // PHARE -- rectangle + cercle sommet, signal cote
-    fill(col);
-    rect(0, h * 0.08, w * 0.3, h * 0.64);
-    fill(accent);
-    ellipse(0, -h * 0.28, w * 0.44, h * 0.34);
-    fill(palette.horizon);
-    ellipse(0, -h * 0.28, w * 0.18, h * 0.14);
+  // ── POINT VIVANT — dernière tuile posée de chaque curseur ──
+  for (let ci = 0; ci < min(lastPlaced.length, cursors.length); ci++) {
+    if (lastPlaced[ci] == null) continue;
+    let idx = lastPlaced[ci];
+    let lc  = idx % cols;
+    let lr  = floor(idx / cols);
+    let px  = lc * cellW + cellW/2;
+    let py  = lr * cellH + cellH/2;
+    let pulse = map(sin(millis() * 0.008 + ci * 1.2), -1, 1, 0.3, 1.0);
+    noFill(); stroke(navStyles[ci].col + 'AA'); strokeWeight(0.8);
+    let ps = (min(cellW, cellH)/2 - 2) * pulse;
+    rect(px - ps, py - ps, ps*2, ps*2);
+    fill(navStyles[ci].col); noStroke();
+    ellipse(px, py, 3, 3);
   }
+
   pop();
+
+  drawMuseumFrame();
+  drawLegend();
+  drawCasaStats();
+
+  if (mouseIsPressed) weaveAll(random(55, 100));
 }
 
-// --------------------------------------------------
-// 11) CADRE MUSÉE
-// --------------------------------------------------
-function drawMuseumFrame() {
-  rectMode(CORNER);
-
-  fill(palette.nuit);
-  noStroke();
-  rect(0,              0,               width,  margin);
-  rect(0,              height - bottomMargin, width, bottomMargin);
-  rect(0,              margin,          margin, height - margin - bottomMargin);
-  rect(width - margin, margin,          margin, height - margin - bottomMargin);
-
-  noFill();
-  stroke(palette.atlantique);
-  strokeWeight(1);
-  rect(margin, margin, width - margin * 2, height - margin - bottomMargin);
-
-  stroke(palette.brume);
-  strokeWeight(2);
-  line(margin, height - bottomMargin, width - margin, height - bottomMargin);
-
-  noStroke();
+// ─── TISSAGE ────────────────────────────────────────────────────
+function weaveAll(velocity) {
+  for (let ci = 0; ci < cursors.length; ci++) {
+    weaveOne(velocity, ci);
+  }
 }
 
-// --------------------------------------------------
-// 12) HUD
-// --------------------------------------------------
-function drawHUD() {
-  let ty = height - bottomMargin + 38;
+function weaveOne(velocity, ci) {
+  let cur   = cursors[ci];
+  let order = getOrder(cur.type);
 
-  let yr  = year();
-  let mo  = nf(month(), 2);
-  let d   = nf(day(), 2);
-  let h   = nf(hour(), 2);
-  let mi  = nf(minute(), 2);
-  let s   = nf(second(), 2);
-
-  textFont("Helvetica");
-  textStyle(NORMAL);
-
-  // ---- GAUCHE ----
-  textAlign(LEFT, TOP);
-  fill(140);
-  textSize(10);
-  text("TANGER, MAROC // INSTITUT FRANÇAIS DU MAROC", margin, ty);
-
-  fill(palette.brume);
-  textSize(11);
-  text(`SYS.TIME ${yr}-${mo}-${d} [${h}:${mi}:${s}]`, margin, ty + 28);
-
-  fill(160);
-  textSize(10);
-  text(
-    `35.7595N / 5.8340W  //  TEMP ${nf(temp, 1, 1)}°C  HUM ${humidity}%  WIND ${nf(wind, 1, 1)} m/s`,
-    margin, ty + 56
-  );
-
-  fill(120);
-  text(`CONDITION : ${description}`, margin, ty + 82);
-
-  // ---- CENTRE ----
-  textAlign(CENTER, TOP);
-  fill(palette.horizon);
-  textSize(16);
-  text("DATA RUG PROTOCOL // 05 TANGER", width * 0.5, ty);
-
-  fill(palette.mediterranee);
-  textSize(9);
-  text("STRAIT SIGNAL  —  Détroit / Entre Deux Mers", width * 0.5, ty + 28);
-
-  fill(120);
-  textSize(9);
-  text("KAMEL GHABTE  //  DATA ART  //  CREATIVE CODING  //  IFM 2026", width * 0.5, ty + 44);
-
-  // Légende chromatique
-  let legendY = ty + 68;
-  let sw = 110;
-  let sx = width * 0.5 - sw * 1.5;
-
-  rectMode(CORNER);
-  fill(palette.atlantique);
-  rect(sx, legendY, 10, 10);
-  fill(130);
-  textAlign(LEFT, TOP);
-  textSize(9);
-  text("≤ 16°C  ATLANTIQUE", sx + 14, legendY);
-
-  fill(palette.mediterranee);
-  rect(sx + sw, legendY, 10, 10);
-  fill(130);
-  text("17–27°C  MÉDITERRANÉE", sx + sw + 14, legendY);
-
-  fill(palette.brume);
-  rect(sx + sw * 2, legendY, 10, 10);
-  fill(130);
-  text("≥ 28°C  BRUME SOLAIRE", sx + sw * 2 + 14, legendY);
-
-  // Légende morphologique
-  let morphY = legendY + 22;
-  let motifNames = ["0·DÉTROIT", "1·HORIZON", "2·PORT", "3·BRUME"];
-  let mstep = 88;
-  let mx = width * 0.5 - (mstep * 1.5);
-  textAlign(LEFT, TOP);
-  textSize(9);
-  for (let i = 0; i < motifNames.length; i++) {
-    fill(100);
-    rect(mx + i * mstep, morphY, 8, 8);
-    fill(130);
-    text(motifNames[i], mx + i * mstep + 12, morphY);
+  // Réinitialisation du cycle
+  if (cur.pos >= order.length) {
+    cur.pos = 0;
+    if (ci === 0) {
+      generation++;
+      // Vieillissement : les carreaux pleins et losanges survivent, les autres disparaissent
+      // Effet d'usure progressive — seule la géométrie fondamentale persiste
+      for (let i = 0; i < loomGrid.length; i++) {
+        if (loomGrid[i].type === 0 || loomGrid[i].type === 3) {
+          loomGrid[i].age = min(loomGrid[i].age + 1, 4);
+        } else if (loomGrid[i].type === 4) {
+          // La dawwama tient deux cycles — motif fort
+          if (loomGrid[i].age >= 2) {
+            loomGrid[i].active = false; loomGrid[i].age = 0;
+          } else {
+            loomGrid[i].age++;
+          }
+        } else {
+          loomGrid[i].active = false; loomGrid[i].age = 0;
+        }
+      }
+    }
   }
 
-  // ---- DROITE ----
-  textAlign(RIGHT, TOP);
-  fill(palette.horizon);
-  textSize(11);
-  text("ALGORITHME ACTIF", width - margin, ty);
+  let idx = order[cur.pos];
+  lastPlaced[ci] = idx;
 
-  fill(160);
-  textSize(10);
-  text(`CONDITION MÉTÉO : ${description}`, width - margin, ty + 28);
+  // ── MOTIF ← humidité + curseur
+  // Chaque curseur a une "spécialité" — son motif dominant
+  let typeWeights;
+  if      (ci === 0) typeWeights = [4, 2, 1, 1, 1]; // snake → surtout carreau plein
+  else if (ci === 1) typeWeights = [1, 3, 2, 1, 1]; // diagonal → bandes
+  else if (ci === 2) typeWeights = [1, 1, 3, 2, 1]; // reverse → damier+losange
+  else if (ci === 3) typeWeights = [1, 1, 1, 3, 2]; // skip → losange+dawwama
+  else               typeWeights = [1, 2, 1, 2, 3]; // spiral → dawwama dominante
 
-  let currentLine = floor((weaveCursor % (cols * rows)) / cols) + 1;
-  text(`PHASE : ${currentLine} / ${rows}`, width - margin, ty + 56);
-  text(`CELLULES : ${weaveCursor % (cols * rows)} / ${cols * rows}`, width - margin, ty + 82);
+  // La complexité augmente avec l'humidité
+  let humFactor = map(humidity, 30, 95, 0.3, 1.0);
+  let type = weightedRandom(typeWeights, humFactor);
+
+  // ── COULEUR ← température + heure + vent
+  let pal;
+  if (wind > 12)     pal = palStorm;
+  else if (isNightInTANGER()) pal = palNight;
+  else               pal = palDay;
+
+  let col;
+  if (temp > 26) {
+    col = random([pal[4], pal[5], pal[4], pal[5], pal[3]]); // chaud : or+terracotta
+  } else if (temp < 15) {
+    col = random([pal[0], pal[1], pal[2], pal[3], pal[0]]); // froid : bleus
+  } else {
+    col = random(pal);
+  }
+
+  // Brume chbab — humidité > 75% : dérive progressive vers le blanc plâtre
+  if (humidity > 75 && random() < map(humidity, 75, 100, 0, 0.7)) {
+    col = lerpColor(color(col), color(isNightInTANGER() ? '#E8E0D2' : '#EFE8D8'),
+                    map(humidity, 75, 100, 0, 0.6)).toString('#rrggbb');
+  }
+
+  // MIDI fort → nuit graphique
+  if (velocity > 108) col = isNightInTANGER() ? '#04112E' : '#0A1828';
+
+  loomGrid[idx].type   = type;
+  loomGrid[idx].col    = col;
+  loomGrid[idx].active = true;
+  loomGrid[idx].born   = millis();
+
+  cur.pos += cur.speed;
 }
 
-// --------------------------------------------------
-// 13) RESIZE
-// --------------------------------------------------
+// Sélection pondérée du motif selon weights + humidité
+function weightedRandom(weights, humFactor) {
+  // Plus l'humidité est haute, plus les motifs avancés (index élevé) sont accessibles
+  let scaled = weights.map((w, i) => {
+    let threshold = i / (weights.length - 1);
+    return w * (threshold <= humFactor ? 1.0 : 0.1);
+  });
+  let total = scaled.reduce((a,b) => a+b, 0);
+  let r = random(total);
+  let acc = 0;
+  for (let i = 0; i < scaled.length; i++) {
+    acc += scaled[i];
+    if (r <= acc) return i;
+  }
+  return 0;
+}
+
+function getOrder(type) {
+  if (type === "DIAGONAL" || type === "SKIP") return orderDiag;
+  if (type === "SPIRAL")                      return orderSpiral;
+  return orderSnake; // SNAKE + REVERSE utilisent le snake (le reverse marche à reculons)
+}
+
+// ─── 5 MOTIFS ZELLIGE ───────────────────────────────────────────
+function drawZelligeMotif(x, y, w, h, type, col) {
+  fill(col); noStroke();
+  let cx = x + w/2;
+  let cy = y + h/2;
+
+  if (type === 0) {
+    // BOUGHAZ — Carreau plein, détroit
+    rect(x, y, w, h);
+  } else if (type === 1) {
+    // MAWJ — Bandes horizontales, vagues
+    let sh = h/3;
+    for (let i = 0; i < 3; i += 2) rect(x, y + i*sh, w, sh);
+  } else if (type === 2) {
+    // MARSA — Triangle + rectangle, port
+    rect(x, y+h/2, w, h/2);
+    fill(lerpColor(color(col), color(10, 10, 20), 0.3));
+    triangle(x, y+h/2, x+w, y+h/2, cx, y);
+  } else if (type === 3) {
+    // MANARA — Losange, phare
+    quad(cx, y, x+w, cy, cx, y+h, x, cy);
+  } else {
+    // RIAH — Hélice, vent du détroit
+    triangle(x, y, x+w, y, cx, cy);
+    triangle(x+w, y+h, x, y+h, cx, cy);
+    fill(lerpColor(color(col), color(10, 10, 20), 0.45));
+    triangle(x+w, y, x+w, y+h, cx, cy);
+    triangle(x, y+h, x, y, cx, cy);
+  }
+}
+
+// ─── CADRE MUSEUM ───────────────────────────────────────────────
+function drawMuseumFrame() {
+  fill(8, 12, 28); noStroke(); rectMode(CORNER);
+  rect(0, 0,              width, margin);
+  rect(0, height - bottomMargin, width, bottomMargin);
+  rect(0, margin,         margin, height - margin - bottomMargin);
+  rect(width - margin, margin, margin, height - margin - bottomMargin);
+
+  // Cadre or — épaisseur varie avec la marée
+  let tideW = map(sin(tidePhase), -1, 1, 0.8, 1.6);
+  noFill(); stroke('#C8A65A'); strokeWeight(tideW);
+  rect(margin, margin, width - margin*2, height - margin - bottomMargin);
+
+  // Liseré intérieur bleu nuit
+  stroke(25, 40, 75); strokeWeight(0.5);
+  rect(margin+5, margin+5, width - margin*2 - 10, height - margin - bottomMargin - 10);
+
+  // Ornements de coin — équerre triple
+  stroke('#C8A65A'); strokeWeight(tideW);
+  let cl = 16;
+  for (let [fx, fy, sx, sy] of [
+    [margin,       margin,               1,  1],
+    [width-margin, margin,              -1,  1],
+    [width-margin, height-bottomMargin, -1, -1],
+    [margin,       height-bottomMargin,  1, -1]
+  ]) {
+    line(fx,       fy,        fx+sx*cl, fy       );
+    line(fx,       fy,        fx,       fy+sy*cl );
+    line(fx+sx*5,  fy+sy*5,   fx+sx*cl, fy+sy*5  );
+    line(fx+sx*5,  fy+sy*5,   fx+sx*5,  fy+sy*cl );
+  }
+  noStroke();
+
+  // ── EN-TÊTE ──
+  // Gauche — IFM
+  textFont('Courier New'); textAlign(LEFT, CENTER);
+  textSize(8); textStyle(BOLD);
+  fill(isNightInTANGER() ? '#C8A65A' : '#C8A65A');
+  text("INSTITUT FRANÇAIS DU MAROC", margin, margin/2 - 7);
+  textSize(7); textStyle(NORMAL); fill(50, 75, 125);
+  text("COLLECTION AFRIC'ARTECH  ·  WEATHER WEAVING", margin, margin/2 + 7);
+
+  // Centre — nuit ou jour change la calligraphie
+  textFont('Georgia'); textSize(15); textStyle(ITALIC);
+  fill('#C8A65A'); textAlign(CENTER, CENTER);
+  text(isNightInTANGER() ? "طنجة بالليل" : "زليج طنجة", width/2, margin/2);
+
+  // Droite — n° + génération + mode
+  textFont('Courier New'); textAlign(RIGHT, CENTER);
+  textSize(7); textStyle(NORMAL); fill(50, 75, 125);
+  text((isNightInTANGER() ? "◆ NUIT · " : "◇ JOUR · ") + "GÉN " + nf(generation, 2), width - margin, margin/2 - 7);
+  textSize(20); textStyle(BOLD); fill('#C8A65A');
+  text("05", width - margin, margin/2 + 6);
+}
+
+// ─── LÉGENDE ────────────────────────────────────────────────────
+function drawLegend() {
+  let bandY    = height - bottomMargin + 10;
+  let previewS = 32;
+  let totalW   = width - margin * 2;
+  let itemW    = totalW / 5;
+
+  let defs = [
+    { type:0, ar:"بوغاز",   name:"BOUGHAZ",   ref:"DETROIT · SNAKE"    },
+    { type:1, ar:"موج",   name:"MAWJ",   ref:"VAGUE · DIAG"    },
+    { type:2, ar:"مرسى",   name:"MARSA",   ref:"PORT · REVERSE"    },
+    { type:3, ar:"منارة",   name:"MANARA",   ref:"PHARE · SKIP"    },
+    { type:4, ar:"رياح",   name:"RIAH",   ref:"VENT · SPIRAL"    },
+  ];
+
+  // Couleurs représentatives selon heure
+  let night = isNightInTANGER();
+  let rc = night
+    ? ['#0A2562','#1A3A8A','#8A1A00','#C8A65A','#142E6A']
+    : ['#092E7A','#2A9CC8','#B83A0A','#C8A65A','#1460C0'];
+
+  textFont('Courier New'); noStroke();
+
+  // Titre légende
+  textSize(7.5); textStyle(BOLD); fill('#C8A65A'); textAlign(LEFT, TOP);
+  text("RÉPERTOIRE  ·  فهرس الزليج", margin, bandY);
+
+  // Barre brume — dégradé turquoise→blanc plâtre
+  let bW = 100; let bX = width - margin - bW;
+  textSize(6.5); textStyle(NORMAL); fill(50, 75, 120); textAlign(RIGHT, TOP);
+  text("CHBAB →", bX - 6, bandY + 1);
+  fill(15, 24, 50); rect(bX, bandY + 2, bW, 4);
+  let bFill = map(humidity, 30, 95, 0, bW);
+  // Dégradé manuel sur la barre
+  for (let bx = 0; bx < bFill; bx++) {
+    let t = bx / bW;
+    fill(lerpColor(color('#2A9CC8'), color('#EFE8D8'), t));
+    rect(bX + bx, bandY + 2, 1, 4);
+  }
+
+  // Séparateur
+  stroke(22, 35, 68); strokeWeight(0.5);
+  line(margin, bandY + 16, width - margin, bandY + 16);
+  noStroke();
+
+  let rowY = bandY + 22;
+
+  for (let i = 0; i < defs.length; i++) {
+    let def = defs[i];
+    let ix  = margin + i * itemW + (itemW - previewS) / 2;
+
+    drawZelligeMotif(ix, rowY, previewS, previewS, def.type, rc[i]);
+    noFill(); stroke(22, 35, 68); strokeWeight(0.5);
+    rect(ix, rowY, previewS, previewS);
+    noStroke();
+
+    textAlign(CENTER, TOP);
+
+    // Nom arabe — priorité
+    textFont('Georgia'); textStyle(ITALIC); textSize(10);
+    fill('#C8A65A');
+    text(def.ar, ix + previewS/2, rowY + previewS + 3);
+
+    // Translittération
+    textFont('Courier New'); textStyle(BOLD); textSize(6.5);
+    fill('#EFE8D8');
+    text(def.name, ix + previewS/2, rowY + previewS + 17);
+
+    // Ref météo + curseur
+    textStyle(NORMAL); textSize(5.5); fill(50, 75, 120);
+    text(def.ref, ix + previewS/2, rowY + previewS + 28);
+  }
+
+  textAlign(LEFT, TOP);
+}
+
+// ─── STATS ──────────────────────────────────────────────────────
+function drawCasaStats() {
+  fill(255); noStroke(); textAlign(LEFT, TOP);
+  let startX = margin;
+  let startY = height - bottomMargin + 118;
+
+  textFont('Courier New'); textSize(16); textStyle(BOLD);
+  fill('#C8A65A');
+  text("TANGER_STRAIT // WEATHER_WEAVE", width/2 - 215, startY);
+
+  textSize(7); textStyle(NORMAL); fill(42, 62, 105);
+  text("Institut Français du Maroc  ·  Œuvre 05 / 12", width/2 - 138, startY + 20);
+
+  textSize(8.5); textStyle(NORMAL); fill(130, 155, 195);
+  text("LOC: TANGER, MAROC", startX, startY);
+
+  fill('#2A9CC8');
+  text(`TEMP: ${nf(temp,2,1)}°C`,       startX,       startY + 14);
+  text(`HUMIDITY: ${humidity}%`,         startX,       startY + 28);
+  text(`WIND: ${nf(wind,1,1)} m/s`,     startX + 165, startY + 14);
+  text(`COND: ${description}`,           startX + 165, startY + 28);
+
+  textAlign(RIGHT, TOP); fill(50, 75, 120); textSize(8.5);
+  text("LIVE DATA VISUALIZATION", width - margin, startY);
+  textSize(7); fill(35, 52, 95);
+  text("MIDI BIODATA ENABLED", width - margin, startY + 14);
+}
+
+// ─── RESIZE ─────────────────────────────────────────────────────
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  initGrid();
-  buildTextureLayer();
+  recalcGrid();
+  buildOrders();
 }
