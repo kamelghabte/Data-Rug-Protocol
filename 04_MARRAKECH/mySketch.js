@@ -24,6 +24,7 @@ let rows = 14;
 let cellW, cellH;
 let weaveCursor = 0;
 let lastActionTime = 0;
+let pendingExport = false;
 
 // --------------------------------------------------
 // 3) PALETTE MARRAKECH
@@ -144,6 +145,12 @@ function draw() {
   if (mouseIsPressed && frameCount % 4 === 0) {
     autoWeave();
   }
+
+  if (pendingExport) {
+    pendingExport = false;
+    let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
+    saveCanvas(`DATA_RUG_IFM_04_MARRAKECH_KAMEL_GHABTE_${ts}`, 'png');
+  }
 }
 
 // --------------------------------------------------
@@ -235,9 +242,9 @@ function pickAccent(baseCol) {
 function weavePattern(velocity) {
   let index = weaveCursor % (cols * rows);
 
+  // Marque export + reset à chaque cycle complet (saveCanvas appelé après drawHUD)
   if (index === 0 && weaveCursor > 0) {
-    let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
-    saveCanvas(`DATA_RUG_IFM_04_MARRAKECH_KAMEL_GHABTE_${ts}`, 'png');
+    pendingExport = true;
     for (let c of loomGrid) c.active = false;
   }
 

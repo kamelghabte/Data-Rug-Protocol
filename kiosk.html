@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATA RUG PROTOCOL — MAROC 12 ANTENNES — Kamel Ghabte</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    cursor: none;
+  }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+    pointer-events: none;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .slide iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* Overlay info ville */
+  .overlay {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 40px 32px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.72));
+    pointer-events: none;
+  }
+
+  .ville-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ville-numero {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+  }
+
+  .ville-titre {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .ville-sous {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+  }
+
+  /* Dots navigation */
+  .dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .dot.active {
+    width: 20px;
+    border-radius: 3px;
+    background: #fff;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: rgba(255,255,255,0.8);
+    z-index: 200;
+    transition: width 0.1s linear;
+  }
+
+  /* Header minimal */
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 40px 0;
+    background: linear-gradient(rgba(0,0,0,0.6), transparent);
+    pointer-events: none;
+  }
+
+  .header-brand {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  .header-brand span {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* Boutons contrôle */
+  .controls {
+    position: fixed;
+    top: 20px;
+    right: 40px;
+    z-index: 200;
+    display: flex;
+    gap: 10px;
+    pointer-events: all;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  body:hover .controls { opacity: 1; cursor: default; }
+  body:hover { cursor: default; }
+
+  .btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 6px 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  .btn.paused { color: #f0a500; border-color: rgba(240,165,0,0.4); }
+
+  /* Loader initial */
+  .loader {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    transition: opacity 1s ease;
+  }
+
+  .loader.fade-out { opacity: 0; pointer-events: none; }
+
+  .loader-title {
+    font-size: 13px;
+    letter-spacing: 8px;
+    color: rgba(255,255,255,0.8);
+    text-transform: uppercase;
+  }
+
+  .loader-sub {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+  }
+
+  .loader-bar-wrap {
+    width: 200px;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .loader-bar {
+    height: 1px;
+    background: rgba(255,255,255,0.6);
+    width: 0;
+    transition: width 0.3s ease;
+  }
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div class="loader" id="loader">
+  <div class="loader-title">Data Rug Protocol</div>
+  <div class="loader-sub">Maroc 12 Antennes · Kamel Ghabte</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"></div></div>
+  <div class="loader-sub" id="loaderStatus">Chargement…</div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-brand">
+    Data Rug Protocol
+    <span>Institut Français du Maroc — 2026</span>
+  </div>
+</div>
+
+<!-- Contrôles -->
+<div class="controls">
+  <button class="btn" id="btnPause" onclick="togglePause()">Pause</button>
+  <button class="btn" onclick="prevSlide()">← Préc</button>
+  <button class="btn" onclick="nextSlide()">Suiv →</button>
+  <button class="btn" onclick="toggleFullscreen()">Plein écran</button>
+</div>
+
+<!-- Stage -->
+<div class="stage" id="stage"></div>
+
+<!-- Overlay -->
+<div class="overlay">
+  <div class="ville-info">
+    <div class="ville-numero" id="overlayNum"></div>
+    <div class="ville-titre" id="overlayTitre"></div>
+    <div class="ville-sous" id="overlaySous"></div>
+  </div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script>
+const VILLES = [
+  { num: "01", ville: "Casablanca", titre: "White Noise Atlantic",   sous: "Vent côtier · Atlantique",       id: "2979684" },
+  { num: "02", ville: "Rabat",      titre: "Oudayas Green Code",     sous: "Bouregreg · Océanique",          id: "2979710" },
+  { num: "03", ville: "Fès",        titre: "Blue Medina Algorithm",  sous: "Médina · Zellige · Tanneries",   id: "2979715" },
+  { num: "04", ville: "Marrakech",  titre: "Ochre Heat Pulse",       sous: "Remparts · Koutoubia",           id: "2979719" },
+  { num: "05", ville: "Tanger",     titre: "Strait Signal",          sous: "Détroit · Deux flores marines",  id: "2979726" },
+  { num: "06", ville: "Tétouan",    titre: "Andalusian White Matrix",sous: "Médina andalouse · Méditerranée",id: "2979731" },
+  { num: "07", ville: "Oujda",      titre: "Gharnati Wind Pattern",  sous: "Continent · Frontière",          id: "2979736" },
+  { num: "08", ville: "Essaouira",  titre: "Mogador Wind Loom",      sous: "Vent permanent · Gnaoua",        id: "2979742" },
+  { num: "09", ville: "Agadir",     titre: "Souss Solar Weave",      sous: "Ensoleillement · Arganier",      id: "2979744" },
+  { num: "10", ville: "Kénitra",    titre: "Sebou Cork Matrix",      sous: "Sebou · Maamora · Liège",        id: "2979745" },
+  { num: "11", ville: "Meknès",     titre: "Imperial Olive Grid",    sous: "Bab Mansour · Volubilis",        id: "2979746" },
+  { num: "12", ville: "El Jadida",  titre: "Mazagan Cistern Pattern",sous: "Citerne · Cité portugaise",      id: "2979747" },
+];
+
+const DURATION = 10000; // 10 secondes
+let current = 0;
+let paused = false;
+let timer = null;
+let progressTimer = null;
+let progressStart = null;
+
+const stage = document.getElementById('stage');
+const dots = document.getElementById('dots');
+
+// Créer les slides
+VILLES.forEach((v, i) => {
+  const slide = document.createElement('div');
+  slide.className = 'slide' + (i === 0 ? ' active' : '');
+  slide.id = 'slide-' + i;
+  slide.innerHTML = `<iframe src="https://openprocessing.org/sketch/${v.id}/embed/" allowfullscreen loading="${i < 3 ? 'eager' : 'lazy'}" title="${v.titre}"></iframe>`;
+  stage.appendChild(slide);
+
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.id = 'dot-' + i;
+  dot.onclick = () => goTo(i);
+  dots.appendChild(dot);
+});
+
+function updateOverlay(i) {
+  const v = VILLES[i];
+  document.getElementById('overlayNum').textContent = `${v.num} / 12 — ${v.ville}`;
+  document.getElementById('overlayTitre').textContent = v.titre;
+  document.getElementById('overlaySous').textContent = v.sous;
+}
+
+function goTo(i) {
+  document.getElementById('slide-' + current).classList.remove('active');
+  document.getElementById('dot-' + current).classList.remove('active');
+  current = i;
+  document.getElementById('slide-' + current).classList.add('active');
+  document.getElementById('dot-' + current).classList.add('active');
+  updateOverlay(current);
+  resetProgress();
+}
+
+function nextSlide() { goTo((current + 1) % VILLES.length); }
+function prevSlide() { goTo((current - 1 + VILLES.length) % VILLES.length); }
+
+function startTimer() {
+  clearInterval(timer);
+  timer = setInterval(() => { if (!paused) nextSlide(); }, DURATION);
+}
+
+// Progress bar fluide
+function resetProgress() {
+  clearInterval(progressTimer);
+  progressStart = Date.now();
+  const bar = document.getElementById('progressBar');
+  bar.style.width = '0%';
+  if (!paused) {
+    progressTimer = setInterval(() => {
+      const elapsed = Date.now() - progressStart;
+      const pct = Math.min((elapsed / DURATION) * 100, 100);
+      bar.style.width = pct + '%';
+    }, 50);
+  }
+}
+
+function togglePause() {
+  paused = !paused;
+  const btn = document.getElementById('btnPause');
+  btn.textContent = paused ? 'Play' : 'Pause';
+  btn.classList.toggle('paused', paused);
+  if (paused) {
+    clearInterval(progressTimer);
+  } else {
+    resetProgress();
+  }
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// Clavier
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prevSlide();
+  if (e.key === ' ') { e.preventDefault(); togglePause(); }
+  if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  if (e.key >= '1' && e.key <= '9') goTo(parseInt(e.key) - 1);
+});
+
+// Loader simulé
+const loaderBar = document.getElementById('loaderBar');
+const loaderStatus = document.getElementById('loaderStatus');
+const cities = VILLES.map(v => v.ville);
+let li = 0;
+const loaderInterval = setInterval(() => {
+  li++;
+  loaderBar.style.width = (li / VILLES.length * 100) + '%';
+  loaderStatus.textContent = cities[li - 1] + '…';
+  if (li >= VILLES.length) {
+    clearInterval(loaderInterval);
+    loaderStatus.textContent = 'Prêt';
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('fade-out');
+      setTimeout(() => document.getElementById('loader').remove(), 1000);
+    }, 400);
+  }
+}, 300);
+
+// Init
+updateOverlay(0);
+startTimer();
+resetProgress();
+</script>
+</body>
+</html>
