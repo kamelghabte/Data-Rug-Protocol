@@ -137,20 +137,18 @@ function draw() {
   drawMuseumFrame();
   drawHUD();
 
-  // Export AVANT tout nouveau tissage
+  // Export : canvas gelé → saveCanvas → reset → reprise
   if (pendingExport) {
     pendingExport = false;
-    // Capture synchrone des pixels MAINTENANT, avant tout autre draw
-    let cnv = document.querySelector('canvas');
-    let dataURL = cnv.toDataURL('image/png');
+    noLoop();
     let ts = `${day()}-${month()}-${year()}_${nf(hour(),2)}h${nf(minute(),2)}`;
-    let a = document.createElement('a');
-    a.href = dataURL;
-    a.download = `DATA_RUG_IFM_01_CASABLANCA_KAMEL_GHABTE_${ts}.png`;
-    a.click();
-    for (let c of loomGrid) c.active = false;
-    weaveCursor = 0;
-    lastActionTime = millis();
+    saveCanvas(`DATA_RUG_IFM_01_CASABLANCA_KAMEL_GHABTE_${ts}`, 'png');
+    setTimeout(() => {
+      for (let c of loomGrid) c.active = false;
+      weaveCursor = 0;
+      lastActionTime = millis();
+      loop();
+    }, 200);
     return;
   }
 
