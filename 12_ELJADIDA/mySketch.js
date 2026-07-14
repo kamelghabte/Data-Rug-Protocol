@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS EL JADIDA
-// Citerne, bastions, reflets, cité portugaise
+// Voute croisee citerne, bastion portugais, reflet eau, meurtriere
 // --------------------------------------------------
 function drawElJadidaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -283,68 +283,59 @@ function drawElJadidaMotif(x, y, w, h, type, col, accent, rot, energy) {
   rotate(rot);
   rectMode(CENTER);
   noStroke();
-
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
-
   if (type === 0) {
-    // BASTION — carré concentrique, fortification portugaise
+    // VOUTE CROISEE -- deux arches qui se coupent, citerne
     fill(col);
-    rect(0, 0, w * 0.86, h * 0.86);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
-    rect(0, 0, w * 0.44, h * 0.44);
+    arc(0, h * 0.22, w * 0.72, h * 0.68, PI, TWO_PI);
+    arc(0, -h * 0.22, w * 0.72, h * 0.68, 0, PI);
     fill(col);
-    rect(0, 0, w * 0.14, h * 0.14);
-
+    ellipse(0, 0, w * 0.18, h * 0.18);
   } else if (type === 1) {
-    // CITERNE — arche, voûte gothique
+    // BASTION PORTUGAIS -- pentagone fortifie
     fill(col);
     beginShape();
-    vertex(-w * 0.38, h * 0.42);
-    vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.42);
+    vertex(0, -h * 0.44);
+    vertex(w * 0.44, -h * 0.14);
+    vertex(w * 0.28, h * 0.44);
+    vertex(-w * 0.28, h * 0.44);
+    vertex(-w * 0.44, -h * 0.14);
     endShape(CLOSE);
     fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.12);
-    fill(palette.blanc);
-    rect(0, h * 0.22, w * 0.14, h * 0.14, 10);
-
+    beginShape();
+    vertex(0, -h * 0.22);
+    vertex(w * 0.22, -h * 0.07);
+    vertex(w * 0.14, h * 0.22);
+    vertex(-w * 0.14, h * 0.22);
+    vertex(-w * 0.22, -h * 0.07);
+    endShape(CLOSE);
+    fill(col);
+    ellipse(0, 0, w * 0.12, h * 0.12);
   } else if (type === 2) {
-    // MIROIR — losange, reflet d'eau
+    // REFLET D EAU -- ellipses symetriques, miroir
     fill(col);
-    beginShape();
-    vertex(0, -h * 0.43);
-    vertex(w * 0.43, 0);
-    vertex(0, h * 0.43);
-    vertex(-w * 0.43, 0);
-    endShape(CLOSE);
+    ellipse(0, -h * 0.18, w * 0.72, h * 0.44);
     fill(accent);
-    beginShape();
-    vertex(0, -h * 0.21);
-    vertex(w * 0.21, 0);
-    vertex(0, h * 0.21);
-    vertex(-w * 0.21, 0);
-    endShape(CLOSE);
-    fill(palette.reflet);
-    beginShape();
-    vertex(0, -h * 0.07);
-    vertex(w * 0.07, 0);
-    vertex(0, h * 0.07);
-    vertex(-w * 0.07, 0);
-    endShape(CLOSE);
-
+    ellipse(0, h * 0.18, w * 0.72, h * 0.44);
+    stroke(col);
+    strokeWeight(2 * energy);
+    line(-w * 0.36, 0, w * 0.36, 0);
+    noStroke();
+    fill(col);
+    ellipse(0, 0, w * 0.1, h * 0.1);
   } else {
-    // REMPART — cercle + bandes, bastions circulaires
+    // MEURTRIERE -- fente verticale dans mur epais
     fill(col);
-    ellipse(0, 0, w * 0.84, h * 0.84);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
-    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
-    rect(0,  h * 0.13, w * 0.46, h * 0.14, 999);
-    fill(palette.blanc);
-    ellipse(0, 0, w * 0.16, h * 0.16);
+    rect(0, 0, w * 0.12, h * 0.72);
+    rect(0, 0, w * 0.44, h * 0.1);
+    fill(col);
+    rect(0, 0, w * 0.04, h * 0.54);
   }
-
   pop();
 }
 

@@ -274,8 +274,8 @@ function autoWeave() {
 }
 
 // --------------------------------------------------
-// 10) MOTIFS KÉNITRA
-// Sebou, Maamora, liège, estuaire
+// 10) MOTIFS KENITRA
+// Anneaux de croissance, veines de liege, meandre Sebou, foret
 // --------------------------------------------------
 function drawKenitraMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -283,68 +283,60 @@ function drawKenitraMotif(x, y, w, h, type, col, accent, rot, energy) {
   rotate(rot);
   rectMode(CENTER);
   noStroke();
-
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
-
   if (type === 0) {
-    // MAAMORA — carré concentrique, anneaux de croissance
-    fill(col);
-    rect(0, 0, w * 0.86, h * 0.86);
-    fill(accent);
-    rect(0, 0, w * 0.44, h * 0.44);
-    fill(col);
-    rect(0, 0, w * 0.14, h * 0.14);
-
+    // ANNEAUX DE CROISSANCE -- ellipses concentriques
+    for (let i = 4; i >= 1; i--) {
+      fill(i % 2 === 0 ? col : accent);
+      ellipse(i * 0.04 * w * energy, 0, w * 0.2 * i, h * 0.22 * i);
+    }
   } else if (type === 1) {
-    // SEBOU — arche, courbe fluviale
+    // VEINES DE LIEGE -- lignes ondulees paralleles
     fill(col);
-    beginShape();
-    vertex(-w * 0.38, h * 0.42);
-    vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.42);
-    endShape(CLOSE);
-    fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.12);
-    fill(palette.ivoire);
-    rect(0, h * 0.22, w * 0.14, h * 0.14, 10);
-
+    rect(0, 0, w * 0.88, h * 0.88);
+    stroke(accent);
+    strokeWeight(1.6 * energy);
+    noFill();
+    for (let i = -3; i <= 3; i++) {
+      beginShape();
+      for (let t = -w * 0.42; t <= w * 0.42; t += 2) {
+        vertex(t, i * h * 0.14 + sin((t / w) * PI * 2 + i) * h * 0.06);
+      }
+      endShape();
+    }
+    noStroke();
   } else if (type === 2) {
-    // LIÈGE — losange, écorce, anneaux
+    // MEANDRE SEBOU -- courbe sinueuse du fleuve
     fill(col);
-    beginShape();
-    vertex(0, -h * 0.43);
-    vertex(w * 0.43, 0);
-    vertex(0, h * 0.43);
-    vertex(-w * 0.43, 0);
-    endShape(CLOSE);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
     beginShape();
-    vertex(0, -h * 0.21);
-    vertex(w * 0.21, 0);
-    vertex(0, h * 0.21);
-    vertex(-w * 0.21, 0);
+    vertex(-w * 0.44, -h * 0.44);
+    bezierVertex(-w * 0.44, h * 0.1, -w * 0.1, -h * 0.1, 0, 0);
+    bezierVertex(w * 0.1, h * 0.1, w * 0.44, -h * 0.1, w * 0.44, h * 0.44);
+    vertex(w * 0.44, h * 0.44);
+    bezierVertex(w * 0.44, h * 0.2, w * 0.2, h * 0.08, 0, h * 0.18);
+    bezierVertex(-w * 0.2, h * 0.28, -w * 0.44, h * 0.22, -w * 0.44, -h * 0.44);
     endShape(CLOSE);
-    fill(palette.mousse);
-    beginShape();
-    vertex(0, -h * 0.07);
-    vertex(w * 0.07, 0);
-    vertex(0, h * 0.07);
-    vertex(-w * 0.07, 0);
-    endShape(CLOSE);
-
   } else {
-    // ESTUAIRE — cercle + bandes, eau douce/salée
+    // FORET MAAMORA -- arbres en rangee
     fill(col);
-    ellipse(0, 0, w * 0.84, h * 0.84);
+    rect(0, h * 0.28, w * 0.88, h * 0.22);
     fill(accent);
-    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
-    rect(0,  h * 0.13, w * 0.46, h * 0.14, 999);
-    fill(palette.ivoire);
-    ellipse(0, 0, w * 0.16, h * 0.16);
+    for (let i = -2; i <= 2; i++) {
+      push();
+      translate(i * w * 0.2, 0);
+      beginShape();
+      vertex(0, -h * 0.42);
+      vertex(w * 0.14, h * 0.14);
+      vertex(-w * 0.14, h * 0.14);
+      endShape(CLOSE);
+      fill(col);
+      rect(0, h * 0.22, w * 0.06, h * 0.18);
+      pop();
+    }
   }
-
   pop();
 }
 

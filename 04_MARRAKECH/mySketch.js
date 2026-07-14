@@ -276,7 +276,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS MARRAKECH
-// Chaleur, remparts, Koutoubia, Jemaa el-Fna
+// Rempart brique, minaret Koutoubia, halo chaleur, palmier
 // --------------------------------------------------
 function drawMarrakechMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -284,68 +284,65 @@ function drawMarrakechMotif(x, y, w, h, type, col, accent, rot, energy) {
   rotate(rot);
   rectMode(CENTER);
   noStroke();
-
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
-
   if (type === 0) {
-    // REMPART — carré concentrique, murailles
+    // REMPART OCRE -- rangees de briques decalees
     fill(col);
-    rect(0, 0, w * 0.86, h * 0.86);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
-    rect(0, 0, w * 0.44, h * 0.44);
-    fill(col);
-    rect(0, 0, w * 0.14, h * 0.14);
-
+    for (let r = -2; r <= 2; r++) {
+      let offset = (r % 2) * w * 0.22;
+      for (let c = -1; c <= 1; c++) {
+        rect(c * w * 0.44 + offset, r * h * 0.18, w * 0.34, h * 0.12, 1);
+      }
+    }
   } else if (type === 1) {
-    // KOUTOUBIA — arche, minaret
+    // KOUTOUBIA -- etoile 6 branches, minaret
     fill(col);
-    beginShape();
-    vertex(-w * 0.38, h * 0.42);
-    vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.42);
-    endShape(CLOSE);
+    rect(0, h * 0.08, w * 0.32, h * 0.56);
     fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.12);
-    fill(palette.blanc);
-    rect(0, h * 0.22, w * 0.12, h * 0.12, 10);
-
+    for (let a = 0; a < 6; a++) {
+      push();
+      rotate((a / 6) * TWO_PI - HALF_PI);
+      beginShape();
+      vertex(0, 0);
+      vertex(w * 0.12, h * 0.22);
+      vertex(0, h * 0.42);
+      vertex(-w * 0.12, h * 0.22);
+      endShape(CLOSE);
+      pop();
+    }
+    fill(col);
+    ellipse(0, -h * 0.34, w * 0.18, h * 0.18);
   } else if (type === 2) {
-    // JEMAA — losange, place, croisement
-    fill(col);
-    beginShape();
-    vertex(0, -h * 0.43);
-    vertex(w * 0.43, 0);
-    vertex(0, h * 0.43);
-    vertex(-w * 0.43, 0);
-    endShape(CLOSE);
+    // CHALEUR -- halos concentriques decentres
+    for (let i = 3; i >= 1; i--) {
+      fill(i % 2 === 0 ? col : accent);
+      ellipse(w * 0.06 * energy, -h * 0.06 * energy, w * 0.3 * i, h * 0.3 * i);
+    }
     fill(accent);
-    beginShape();
-    vertex(0, -h * 0.21);
-    vertex(w * 0.21, 0);
-    vertex(0, h * 0.21);
-    vertex(-w * 0.21, 0);
-    endShape(CLOSE);
-    fill(palette.or);
-    beginShape();
-    vertex(0, -h * 0.07);
-    vertex(w * 0.07, 0);
-    vertex(0, h * 0.07);
-    vertex(-w * 0.07, 0);
-    endShape(CLOSE);
-
+    ellipse(0, 0, w * 0.14, h * 0.14);
   } else {
-    // SOLEIL — cercle + bandes, chaleur, pulsation
+    // PALMIER -- silhouette stylisee, Palmeraie
     fill(col);
-    ellipse(0, 0, w * 0.84, h * 0.84);
+    rect(0, h * 0.2, w * 0.14, h * 0.48);
     fill(accent);
-    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
-    rect(0,  h * 0.13, w * 0.46, h * 0.14, 999);
-    fill(palette.blanc);
-    ellipse(0, 0, w * 0.16, h * 0.16);
+    for (let a = -2; a <= 2; a++) {
+      push();
+      translate(0, -h * 0.08);
+      rotate(a * PI / 7);
+      beginShape();
+      vertex(0, 0);
+      vertex(w * 0.08, -h * 0.3);
+      vertex(0, -h * 0.38);
+      vertex(-w * 0.08, -h * 0.3);
+      endShape(CLOSE);
+      pop();
+    }
+    fill(col);
+    ellipse(0, -h * 0.08, w * 0.12, h * 0.12);
   }
-
   pop();
 }
 

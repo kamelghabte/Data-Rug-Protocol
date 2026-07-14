@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS OUJDA
-// Gharnati, Reggada, frontière, chaleur sèche
+// Bande sonore Gharnati, frontiere, compression chaleur, croix Reggada
 // --------------------------------------------------
 function drawOujdaMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -283,68 +283,50 @@ function drawOujdaMotif(x, y, w, h, type, col, accent, rot, energy) {
   rotate(rot);
   rectMode(CENTER);
   noStroke();
-
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
-
   if (type === 0) {
-    // BAB — carré concentrique, porte monumentale
+    // BANDE SONORE -- barres de hauteur variable, musique Gharnati
     fill(col);
-    rect(0, 0, w * 0.86, h * 0.86);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
-    rect(0, 0, w * 0.44, h * 0.44);
-    fill(col);
-    rect(0, 0, w * 0.14, h * 0.14);
-
+    for (let i = 0; i < 7; i++) {
+      let bx = map(i, 0, 6, -w * 0.36, w * 0.36);
+      let bh = (0.2 + 0.6 * abs(sin(i * 1.3 + frameCount * 0.04))) * h * energy;
+      rect(bx, 0, w * 0.07, bh);
+    }
   } else if (type === 1) {
-    // GHARNATI — arche, musique andalouse orientale
+    // FRONTIERE -- ligne verticale dure, deux zones
     fill(col);
-    beginShape();
-    vertex(-w * 0.38, h * 0.42);
-    vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.42);
-    endShape(CLOSE);
+    rect(-w * 0.22, 0, w * 0.44, h * 0.88);
     fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.12);
-    fill(palette.blanc);
-    rect(0, h * 0.22, w * 0.14, h * 0.14, 10);
-
+    rect(w * 0.22, 0, w * 0.44, h * 0.88);
+    fill(col);
+    rect(0, 0, w * 0.04, h * 0.88);
+    fill(accent);
+    ellipse(0, 0, w * 0.14, h * 0.14);
   } else if (type === 2) {
-    // REGGADA — losange, rythme percussif
-    fill(col);
-    beginShape();
-    vertex(0, -h * 0.43);
-    vertex(w * 0.43, 0);
-    vertex(0, h * 0.43);
-    vertex(-w * 0.43, 0);
-    endShape(CLOSE);
-    fill(accent);
-    beginShape();
-    vertex(0, -h * 0.21);
-    vertex(w * 0.21, 0);
-    vertex(0, h * 0.21);
-    vertex(-w * 0.21, 0);
-    endShape(CLOSE);
-    fill(palette.cuivre);
-    beginShape();
-    vertex(0, -h * 0.07);
-    vertex(w * 0.07, 0);
-    vertex(0, h * 0.07);
-    vertex(-w * 0.07, 0);
-    endShape(CLOSE);
-
+    // COMPRESSION CHALEUR -- rectangles qui retrecissent vers centre
+    for (let i = 4; i >= 1; i--) {
+      fill(i % 2 === 0 ? col : accent);
+      rect(0, 0, w * 0.22 * i, h * 0.82);
+    }
   } else {
-    // FRONTIÈRE — cercle + bandes, passage oriental
+    // REGGADA -- croix diagonale rythmique
     fill(col);
-    ellipse(0, 0, w * 0.84, h * 0.84);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
-    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
-    rect(0,  h * 0.13, w * 0.46, h * 0.14, 999);
-    fill(palette.blanc);
-    ellipse(0, 0, w * 0.16, h * 0.16);
+    push(); rotate(PI / 4);
+    rect(0, 0, w * 0.76, h * 0.14 * energy);
+    pop();
+    push(); rotate(-PI / 4);
+    rect(0, 0, w * 0.76, h * 0.14 * energy);
+    pop();
+    for (let i = -1; i <= 1; i += 2) {
+      fill(col);
+      ellipse(i * w * 0.3, i * h * 0.3, w * 0.12, h * 0.12);
+    }
   }
-
   pop();
 }
 

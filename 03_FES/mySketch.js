@@ -274,8 +274,8 @@ function autoWeave() {
 }
 
 // --------------------------------------------------
-// 10) MOTIFS FÈS
-// Zellige, médina fractale, tanneries, bleu de Fès
+// 10) MOTIFS FES
+// Zellige fractal, entrelacs medina, tannerie vue du ciel, mihrab
 // --------------------------------------------------
 function drawFesMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -283,72 +283,63 @@ function drawFesMotif(x, y, w, h, type, col, accent, rot, energy) {
   rotate(rot);
   rectMode(CENTER);
   noStroke();
-
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
-
   if (type === 0) {
-    // ZELLIGE — étoile 8 branches (deux carrés tournés)
-    fill(col);
-    rect(0, 0, w * 0.68, h * 0.68);
-    push();
-    rotate(PI / 4);
-    rect(0, 0, w * 0.68, h * 0.68);
-    pop();
-    fill(palette.noir);
-    ellipse(0, 0, w * 0.32, h * 0.32);
-    fill(accent);
-    ellipse(0, 0, w * 0.18, h * 0.18);
-
+    // ZELLIGE FRACTAL -- carre tournant dans carre
+    for (let i = 0; i < 4; i++) {
+      let s = 1 - i * 0.2;
+      fill(i % 2 === 0 ? col : accent);
+      push();
+      rotate(i * PI / 8);
+      rect(0, 0, w * 0.86 * s, h * 0.86 * s);
+      pop();
+    }
   } else if (type === 1) {
-    // MÉDINA — arche labyrinthique
+    // ENTRELACS -- bandes croisees diagonales
     fill(col);
-    beginShape();
-    vertex(-w * 0.38, h * 0.42);
-    vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.42);
-    endShape(CLOSE);
+    rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.12);
-    fill(palette.blanc);
-    rect(0, h * 0.22, w * 0.12, h * 0.12, 10);
-
-  } else if (type === 2) {
-    // TANNERIE — losange, bassins
+    push(); rotate(PI / 4);
+    rect(0, 0, w * 0.54, h * 0.18);
+    pop();
+    push(); rotate(-PI / 4);
+    rect(0, 0, w * 0.54, h * 0.18);
+    pop();
     fill(col);
-    beginShape();
-    vertex(0, -h * 0.43);
-    vertex(w * 0.43, 0);
-    vertex(0, h * 0.43);
-    vertex(-w * 0.43, 0);
-    endShape(CLOSE);
-    fill(accent);
-    beginShape();
-    vertex(0, -h * 0.21);
-    vertex(w * 0.21, 0);
-    vertex(0, h * 0.21);
-    vertex(-w * 0.21, 0);
-    endShape(CLOSE);
-    fill(palette.turquoise);
-    beginShape();
-    vertex(0, -h * 0.07);
-    vertex(w * 0.07, 0);
-    vertex(0, h * 0.07);
-    vertex(-w * 0.07, 0);
-    endShape(CLOSE);
-
-  } else {
-    // SAVOIR — cercle + bandes, manuscrit, savoir circulaire
-    fill(col);
-    ellipse(0, 0, w * 0.84, h * 0.84);
-    fill(accent);
-    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
-    rect(0,  h * 0.13, w * 0.46, h * 0.14, 999);
-    fill(palette.blanc);
     ellipse(0, 0, w * 0.16, h * 0.16);
+  } else if (type === 2) {
+    // TANNERIE -- cercles concentriques de cuves, vue aerienne
+    for (let i = 4; i >= 1; i--) {
+      fill(i % 2 === 0 ? col : accent);
+      ellipse(0, 0, w * 0.22 * i, h * 0.22 * i);
+    }
+    stroke(accent);
+    strokeWeight(1.2 * energy);
+    for (let a = 0; a < 6; a++) {
+      let ang = (a / 6) * TWO_PI;
+      line(0, 0, cos(ang) * w * 0.42, sin(ang) * h * 0.42);
+    }
+    noStroke();
+  } else {
+    // MIHRAB -- niche en etoile 12 branches, Karaouiyine
+    fill(col);
+    rect(0, 0, w * 0.78, h * 0.78);
+    fill(accent);
+    for (let a = 0; a < 12; a++) {
+      push();
+      rotate((a / 12) * TWO_PI);
+      beginShape();
+      vertex(0, h * 0.08);
+      vertex(w * 0.07, h * 0.22);
+      vertex(0, h * 0.38);
+      vertex(-w * 0.07, h * 0.22);
+      endShape(CLOSE);
+      pop();
+    }
+    fill(col);
+    ellipse(0, 0, w * 0.14, h * 0.14);
   }
-
   pop();
 }
 

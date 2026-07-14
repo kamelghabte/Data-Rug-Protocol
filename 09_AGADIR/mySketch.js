@@ -277,7 +277,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS AGADIR
-// Soleil, arganier, vagues, reconstruction
+// Branche arganier, soleil reconstruction, vague Souss, triangles dunes
 // --------------------------------------------------
 function drawAgadirMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -285,68 +285,66 @@ function drawAgadirMotif(x, y, w, h, type, col, accent, rot, energy) {
   rotate(rot);
   rectMode(CENTER);
   noStroke();
-
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
-
   if (type === 0) {
-    // SOUSS — carré concentrique, reconstruction moderne
+    // ARGANIER -- branche ramifiee organique
     fill(col);
-    rect(0, 0, w * 0.86, h * 0.86);
+    ellipse(0, 0, w * 0.82, h * 0.82);
+    stroke(accent);
+    strokeWeight(2 * energy);
+    line(0, h * 0.38, 0, -h * 0.06);
+    line(0, -h * 0.06, w * 0.28, -h * 0.34);
+    line(0, -h * 0.06, -w * 0.28, -h * 0.34);
+    line(w * 0.28, -h * 0.34, w * 0.38, -h * 0.24);
+    line(-w * 0.28, -h * 0.34, -w * 0.38, -h * 0.24);
+    noStroke();
     fill(accent);
-    rect(0, 0, w * 0.44, h * 0.44);
-    fill(col);
-    rect(0, 0, w * 0.14, h * 0.14);
-
+    for (let pt of [[-0.38,-0.34],[0.38,-0.34],[0.28,-0.24],[-0.28,-0.24],[0,-0.42]]) {
+      ellipse(pt[0]*w, pt[1]*h, w*0.08, h*0.08);
+    }
   } else if (type === 1) {
-    // ARGAN — arche, forme organique, noyau
+    // SOLEIL RECONSTRUCTION -- rayons reguliers
     fill(col);
-    beginShape();
-    vertex(-w * 0.38, h * 0.42);
-    vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.42);
-    endShape(CLOSE);
+    ellipse(0, 0, w * 0.44, h * 0.44);
     fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.12);
-    fill(palette.creme);
-    rect(0, h * 0.22, w * 0.14, h * 0.14, 10);
-
+    for (let a = 0; a < 12; a++) {
+      push();
+      rotate((a / 12) * TWO_PI);
+      rect(0, -h * 0.34, w * 0.08, h * 0.2, 2);
+      pop();
+    }
+    fill(col);
+    ellipse(0, 0, w * 0.22, h * 0.22);
   } else if (type === 2) {
-    // VAGUE — losange, Atlantique, surf
+    // VAGUE SOUSS -- sinusoide ample
     fill(col);
-    beginShape();
-    vertex(0, -h * 0.43);
-    vertex(w * 0.43, 0);
-    vertex(0, h * 0.43);
-    vertex(-w * 0.43, 0);
-    endShape(CLOSE);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
     beginShape();
-    vertex(0, -h * 0.21);
-    vertex(w * 0.21, 0);
-    vertex(0, h * 0.21);
-    vertex(-w * 0.21, 0);
+    vertex(-w * 0.44, h * 0.44);
+    for (let t = -w * 0.44; t <= w * 0.44; t += 2) {
+      vertex(t, sin((t / w) * TWO_PI) * h * 0.28 * energy);
+    }
+    vertex(w * 0.44, h * 0.44);
     endShape(CLOSE);
-    fill(palette.solaire);
-    beginShape();
-    vertex(0, -h * 0.07);
-    vertex(w * 0.07, 0);
-    vertex(0, h * 0.07);
-    vertex(-w * 0.07, 0);
-    endShape(CLOSE);
-
   } else {
-    // SOLEIL — cercle + bandes, lumière
+    // DUNES -- triangles disperses, sable
     fill(col);
-    ellipse(0, 0, w * 0.84, h * 0.84);
+    rect(0, 0, w * 0.88, h * 0.88);
     fill(accent);
-    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
-    rect(0,  h * 0.13, w * 0.46, h * 0.14, 999);
-    fill(palette.creme);
-    ellipse(0, 0, w * 0.16, h * 0.16);
+    let pts = [[-0.3,-0.28],[0.28,-0.18],[-0.08,0.1],[0.2,0.28],[-0.3,0.16],[0,-0.06]];
+    for (let pt of pts) {
+      push();
+      translate(pt[0]*w, pt[1]*h);
+      beginShape();
+      vertex(0, -h * 0.1);
+      vertex(w * 0.08, h * 0.1);
+      vertex(-w * 0.08, h * 0.1);
+      endShape(CLOSE);
+      pop();
+    }
   }
-
   pop();
 }
 

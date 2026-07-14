@@ -275,7 +275,7 @@ function autoWeave() {
 
 // --------------------------------------------------
 // 10) MOTIFS RABAT
-// Oudayas, jardins, arcs, Tour Hassan — formes pleines
+// Remparts Oudayas, arc mauresque, etoile zellige vert, fleuve
 // --------------------------------------------------
 function drawRabatMotif(x, y, w, h, type, col, accent, rot, energy) {
   push();
@@ -283,68 +283,63 @@ function drawRabatMotif(x, y, w, h, type, col, accent, rot, energy) {
   rotate(rot);
   rectMode(CENTER);
   noStroke();
-
   let breath = 1 + sin(frameCount * 0.03 + x * 0.01 + y * 0.01) * 0.02 * energy;
   scale(breath);
-
   if (type === 0) {
-    // KASBAH — carré plein + carré intérieur tournant
+    // REMPART -- creneaux, silhouette Oudayas
+    fill(col);
+    rect(0, h * 0.1, w * 0.86, h * 0.66);
+    fill(accent);
+    for (let i = -1; i <= 1; i++) {
+      rect(i * w * 0.28, -h * 0.26, w * 0.2, h * 0.28);
+    }
+    fill(col);
+    ellipse(0, -h * 0.38, w * 0.16, h * 0.16);
+  } else if (type === 1) {
+    // ARC MAURESQUE -- ogive outrepassee
+    fill(col);
+    rect(0, h * 0.22, w * 0.52, h * 0.44);
+    beginShape();
+    vertex(-w * 0.26, h * 0.22);
+    vertex(-w * 0.26, -h * 0.06);
+    bezierVertex(-w * 0.26, -h * 0.48, w * 0.26, -h * 0.48, w * 0.26, -h * 0.06);
+    vertex(w * 0.26, h * 0.22);
+    endShape(CLOSE);
+    fill(accent);
+    ellipse(0, -h * 0.18, w * 0.18, h * 0.22);
+    fill(col);
+    ellipse(0, -h * 0.18, w * 0.08, h * 0.1);
+  } else if (type === 2) {
+    // ZELLIGE VERT -- etoile a 8 branches
     fill(col);
     rect(0, 0, w * 0.86, h * 0.86);
     fill(accent);
-    rect(0, 0, w * 0.44, h * 0.44);
+    for (let a = 0; a < 8; a++) {
+      push();
+      rotate((a / 8) * TWO_PI);
+      rect(0, -h * 0.3, w * 0.18, h * 0.28);
+      pop();
+    }
     fill(col);
-    rect(0, 0, w * 0.14, h * 0.14);
-
-  } else if (type === 1) {
-    // ARC HASSAN — arche verticale, Tour Hassan
-    fill(col);
-    beginShape();
-    vertex(-w * 0.38, h * 0.42);
-    vertex(-w * 0.38, -h * 0.02);
-    bezierVertex(-w * 0.38, -h * 0.36, w * 0.38, -h * 0.36, w * 0.38, -h * 0.02);
-    vertex(w * 0.38, h * 0.42);
-    endShape(CLOSE);
-    fill(accent);
-    rect(0, h * 0.12, w * 0.5, h * 0.12);
-    fill(palette.ivoire);
-    rect(0, h * 0.2, w * 0.14, h * 0.14, 10);
-
-  } else if (type === 2) {
-    // JARDIN — losange, forme végétale, respiration
-    fill(col);
-    beginShape();
-    vertex(0, -h * 0.43);
-    vertex(w * 0.43, 0);
-    vertex(0, h * 0.43);
-    vertex(-w * 0.43, 0);
-    endShape(CLOSE);
-    fill(accent);
-    beginShape();
-    vertex(0, -h * 0.21);
-    vertex(w * 0.21, 0);
-    vertex(0, h * 0.21);
-    vertex(-w * 0.21, 0);
-    endShape(CLOSE);
-    fill(palette.mousse);
-    beginShape();
-    vertex(0, -h * 0.07);
-    vertex(w * 0.07, 0);
-    vertex(0, h * 0.07);
-    vertex(-w * 0.07, 0);
-    endShape(CLOSE);
-
+    rect(0, 0, w * 0.28, h * 0.28, 2);
   } else {
-    // BOUREGREG — cercle + bandes, fleuve, pont
+    // BOUREGREG -- fleuve, double rive sinueuse
     fill(col);
-    ellipse(0, 0, w * 0.84, h * 0.84);
+    ellipse(0, 0, w * 0.82, h * 0.82);
+    stroke(accent);
+    strokeWeight(2 * energy);
+    noFill();
+    for (let i = -1; i <= 1; i += 2) {
+      beginShape();
+      for (let t = -w * 0.38; t <= w * 0.38; t += 2) {
+        vertex(t, i * sin((t / w) * PI) * h * 0.22);
+      }
+      endShape();
+    }
+    noStroke();
     fill(accent);
-    rect(0, -h * 0.13, w * 0.46, h * 0.14, 999);
-    rect(0, h * 0.13, w * 0.46, h * 0.14, 999);
-    fill(palette.ivoire);
-    ellipse(0, 0, w * 0.16, h * 0.16);
+    ellipse(0, 0, w * 0.1, h * 0.1);
   }
-
   pop();
 }
 
