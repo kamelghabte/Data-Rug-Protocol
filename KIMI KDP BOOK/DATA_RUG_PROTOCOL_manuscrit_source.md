@@ -24,7 +24,7 @@ Tous droits réservés. Aucune partie de cet ouvrage ne peut être reproduite, s
 
 Les œuvres de la série *Data Rug Protocol — Maroc 12 Antennes* sont une commande de l'Institut Français du Maroc, présentée dans le cadre de Novembre Numérique 2026.
 
-Les relevés génératifs reproduits dans cet ouvrage sont des interprétations plastiques réalisées par l'auteur à partir du protocole ; les œuvres elles-mêmes sont vivantes, temps réel, et ne coïncident jamais deux fois avec aucune image imprimée.
+Les planches reproduites dans cet ouvrage sont des captures des œuvres vivantes de la série (kamelghabte.me) ; les œuvres elles-mêmes sont temps réel et ne coïncident jamais deux fois avec aucune image imprimée.
 
 Données climatologiques : Banque mondiale (World Bank Open Data), IRES, IMIS, Ministère de l'Équipement et de l'Eau du Royaume du Maroc.
 
@@ -98,7 +98,7 @@ Les annexes rassemblent le catalogue technique des douze œuvres, l'architecture
 
 ## Une note sur les images
 
-Une œuvre temps réel ne peut pas être *reproduite* : toute image n'en est qu'un relevé — ce que la botanique est à la plante. Les planches de ce livre sont donc présentées comme des **relevés génératifs** : des captures d'état du protocole, conformes à sa grammaire et à ses palettes, et non comme les œuvres elles-mêmes, qui continuent de se tisser, quelque part, au rythme du vent de Casablanca, de Fès ou d'Essaouira.
+Une œuvre temps réel ne peut pas être *reproduite* : toute image n'en est qu'une capture — ce que le relevé botanique est à la plante. Les planches de ce livre sont des **captures des œuvres vivantes** elles-mêmes, prélevées sur le site du projet (kamelghabte.me) au moment de l'écriture : chacune documente l'état du climat de sa ville à cet instant précis, avec sa palette et sa trame propres. Les œuvres, elles, continuent de se tisser — quelque part, au rythme du vent de Casablanca, de Fès ou d'Essaouira.
 
 # PARTIE I — FONDEMENTS {.part}
 
@@ -282,22 +282,22 @@ Le protocole prévoit aussi l'interaction : un contrôleur MIDI peut « jouer »
 
 ## 6.1 Une famille formelle, douze dialectes
 
-Le protocole est commun ; les œuvres sont singulières. Chaque ville reçoit un titre, une palette, un répertoire de motifs et de signes culturels qui la rattachent à sa géographie, son architecture et son histoire — une même grammaire, douze dialectes. Le tableau 2 donne la vue d'ensemble ; le catalogue technique complet figure en annexe A.
+Le protocole est commun ; les œuvres sont singulières. Chaque ville reçoit un titre, une palette, un répertoire de motifs et de signes culturels qui la rattachent à sa géographie, son architecture et son histoire — une même grammaire, douze dialectes. Le tableau 2 donne la vue d'ensemble ; le catalogue technique complet figure en annexe A, et le portfolio en fin de chapitre (6.4) rassemble une capture de chacune des douze œuvres vivantes.
 
 | N° | Ville | Œuvre | Signes culturels |
 |---|---|---|---|
-| 01 | Casablanca | *WHITE NOISE ATLANTIC* | Art déco, Atlantique, flux urbains |
-| 02 | Rabat | *OUDAYAS GREEN CODE* | Kasbah des Oudayas, Tour Hassan, Bouregreg |
-| 03 | Fès | *THE BLUE MEDINA ALGORITHM* | Médina, tanneries, zellige |
-| 04 | Marrakech | *OCHRE HEAT PULSE* | Remparts, Koutoubia, Jemaa El-Fna |
-| 05 | Tanger | *STRAIT SIGNAL* | Détroit de Gibraltar, port, horizon |
-| 06 | Tétouan | *ANDALUSIAN WHITE MATRIX* | Médina andalouse, broderies du Nord |
-| 07 | Oujda | *GHARNATI WIND PATTERN* | Gharnati, Reggada, frontière |
-| 08 | Essaouira | *MOGADOR WIND LOOM* | Vent, thuya, Gnaoua, filets |
-| 09 | Agadir | *SOUSS SOLAR WEAVE* | Arganier, Atlantique, reconstruction |
-| 10 | Kénitra | *SEBOU CORK MATRIX* | Sebou, forêt de la Maâmora, liège |
-| 11 | Meknès | *IMPERIAL OLIVE GRID* | Bab Mansour, Volubilis, oliviers |
-| 12 | El Jadida | *MAZAGAN CISTERN PATTERN* | Citerne portugaise, bastions, reflets |
+| 01 | Casablanca | *WHITE NOISE ATLANTIC* | Art déco · Atlantique · Habous |
+| 02 | Rabat | *OUDAYAS GREEN CODE* | Oudayas · Tour Hassan · Bouregreg |
+| 03 | Fès | *THE BLUE MEDINA ALGORITHM* | Médina · tanneries · zellige |
+| 04 | Marrakech | *OCHRE HEAT PULSE* | Koutoubia · Jemaa El-Fna · Atlas |
+| 05 | Tanger | *STRAIT SIGNAL* | Détroit de Gibraltar · port |
+| 06 | Tétouan | *ANDALUSIAN WHITE MATRIX* | Médina andalouse · broderies |
+| 07 | Oujda | *GHARNATI WIND PATTERN* | Gharnati · Reggada · frontière |
+| 08 | Essaouira | *MOGADOR WIND LOOM* | Vent · thuya · Gnaoua |
+| 09 | Agadir | *SOUSS SOLAR WEAVE* | Arganier · Atlantique · surf |
+| 10 | Kénitra | *SEBOU CORK MATRIX* | Sebou · Maamora · liège |
+| 11 | Meknès | *IMPERIAL OLIVE GRID* | Bab Mansour · Volubilis · oliviers |
+| 12 | El Jadida | *MAZAGAN CISTERN PATTERN* | Citerne portugaise · bastions |
 
 Tableau 2 — Les douze œuvres de la série *Maroc 12 Antennes* (commande Institut Français du Maroc, 2026).
 
@@ -305,65 +305,94 @@ Tableau 2 — Les douze œuvres de la série *Maroc 12 Antennes* (commande Insti
 
 ### Casablanca — *WHITE NOISE ATLANTIC*
 
-La Ville Blanche est traitée comme une fréquence : dense, orthogonale, traversée de bruit blanc. Les motifs empruntent aux façades art déco du centre-ville (l'étoile à double carré tourné de 45°), aux arcades du quartier Habous, au zellige octogonal, et à la vague atlantique de la Corniche. Le fond est sombre, traversé d'un grain — la ville la nuit, vue depuis la mer. La palette joue du blanc minéral au bleu océan, relevée d'un cyan « signal » réservé à la navette : quand le vent d'ouest se lève, des filaments cyan s'enfilent dans la trame comme une écume.
+*La Ville Blanche / Fréquence Atlantique.* Casablanca devient une trame de flux — blanche, minérale, maritime. L'océan déforme la grille comme un signal basse fréquence : aplats d'écume et de bleu profond, losanges berbères fragmentés par la houle, et ce cyan « signal » réservé à la navette — quand le vent d'ouest se lève, des filaments clairs s'enfilent dans la trame. La ville la plus dense du pays y produit ses tapis les plus électriques.
 
-<div class="plate"><img src="fig/rug_casa.png" alt="Relevé génératif — Casablanca"/></div>
+<div class="plate"><img src="art_c/01_casablanca.jpg" alt="*WHITE NOISE ATLANTIC* — Casablanca. Capture de l'œuvre vivante (kamelghabte.me)."/></div>
 
-Planche 1 — *WHITE NOISE ATLANTIC*, relevé génératif (Casablanca, humidité modérée, régime de nuit).
+Planche 1 — *WHITE NOISE ATLANTIC* — Casablanca. Capture de l'œuvre vivante (kamelghabte.me).
 
 ### Rabat — *OUDAYAS GREEN CODE*
 
-Rabat tisse en vert et en bleu profond : le vert des jardins andalous et des Oudayas, l'ivoire de la lumière du Bouregreg, l'or de la Tour Hassan à midi. La trame y est volontiers ordonnée, presque administrative — capitale oblige — mais traversée d'accents végétaux : la ville où le fleuve rencontre l'océan produit des tapis où le calme du jardin affronte le large.
+*Capitale Verte / Oudayas Signal.* La capitale se tisse en arcs et respirations vertes : kasbah des Oudayas, Tour Hassan, estuaire du Bouregreg. Le vert des jardins andalous y affronte le bleu nuit de l'Atlantique, l'or de la Tour à midi ponctue la trame — une ville-jardin dont le tapis respire entre fleuve et océan.
 
-<div class="plate"><img src="fig/rug_rabat.png" alt="Relevé génératif — Rabat"/></div>
+<div class="plate"><img src="art_c/02_rabat.jpg" alt="*OUDAYAS GREEN CODE* — Rabat. Capture de l'œuvre vivante."/></div>
 
-Planche 2 — *OUDAYAS GREEN CODE*, relevé génératif (Rabat).
+Planche 2 — *OUDAYAS GREEN CODE* — Rabat. Capture de l'œuvre vivante.
 
 ### Fès — *THE BLUE MEDINA ALGORITHM*
 
-Fès est la ville-mémoire du zellige : c'est ici que la géométrie sacrée a atteint sa plus haute complexité, et l'œuvre le lui rend — la trame y est la plus dense de la série, la plus proche du chantier des maâlems. Le bleu de Fès domine, l'ocre des tanneries marque les temps forts, la turquoise y fige l'eau des fontaines. Un tapis de Fès à forte humidité est presque illisible de richesse : la médina elle-même, vue d'en haut, à l'heure où ses mille ruelles fument.
+*Médina Fractale / Savoir et Artisanat.* La médina labyrinthique génère un algorithme fractal — micro-motifs imbriqués, couches de zellige, mémoire de l'artisanat. Fès est la ville-mémoire du pavage : la trame y est la plus dense de la série, la plus proche du chantier des maâlems. Le bleu de Fès domine, l'ocre des tanneries marque les temps forts, la turquoise fige l'eau des fontaines.
 
-<div class="plate"><img src="fig/rug_fes.png" alt="Relevé génératif — Fès"/></div>
+<div class="plate"><img src="art_c/03_fes.jpg" alt="*THE BLUE MEDINA ALGORITHM* — Fès. Capture de l'œuvre vivante."/></div>
 
-Planche 3 — *THE BLUE MEDINA ALGORITHM*, relevé génératif (Fès, humidité élevée).
+Planche 3 — *THE BLUE MEDINA ALGORITHM* — Fès. Capture de l'œuvre vivante.
 
 ### Marrakech — *OCHRE HEAT PULSE*
 
-Marrakech est l'œuvre de la chaleur. L'ocre des remparts, le rouge des après-midis de juillet, l'or du soleil rasant sur Jemaa El-Fna — et, en contrepoint froid, le bleu Majorelle, trace du jardin le plus célèbre de la ville. Sous la canicule, la palette « feu solaire » envahit la trame : le tapis devient un mur de chaleur. La ville qui accueille près de quatre millions de visiteurs par an dans un bassin versant dont le capital eau n'excède plus 430 m³ par habitant [5] voit son tapis rougeoyer : la beauté y est un signal d'alarme qui a choisi de ne pas hurler.
+*Ville Ocre / Chaleur Rituelle.* Marrakech devient une surface solaire : le motif bat, chauffe et respire comme Jemaa El-Fna au coucher du soleil. L'ocre des remparts, le rouge des après-midis de juillet, l'or rasant — et, en contrepoint froid, le bleu Majorelle. Sous la canicule, la palette « feu solaire » envahit la trame : le tapis devient un mur de chaleur. La ville qui accueille près de quatre millions de visiteurs par an dans un bassin versant dont le capital eau n'excède plus 430 m³ par habitant [5] voit son tapis rougeoyer : la beauté y est un signal d'alarme qui a choisi de ne pas hurler.
 
-<div class="plate"><img src="fig/rug_marrakech.png" alt="Relevé génératif — Marrakech"/></div>
+<div class="plate"><img src="art_c/04_marrakech.jpg" alt="*OCHRE HEAT PULSE* — Marrakech. Capture de l'œuvre vivante."/></div>
 
-Planche 4 — *OCHRE HEAT PULSE*, relevé génératif (Marrakech, régime chaud).
+Planche 4 — *OCHRE HEAT PULSE* — Marrakech. Capture de l'œuvre vivante.
 
 ### Essaouira — *MOGADOR WIND LOOM*
 
-À Essaouira, le vent est une identité : l'alizé y souffle si constamment que la ville s'en est fait un nom — la cité des alizés. L'œuvre en fait son moteur premier : les jours de grand vent, les cinq navettes y courent à une cadence que nulle autre ville n'atteint, et le tapis s'achève en une après-midi. Le bleu Mogador, l'écume blanche, le bois de thuya des artisans, le vert gnaoua : un tapis d'Essaouira se reconnaît à son rythme avant même qu'à ses couleurs.
+*Mogador / Vent, Bois et Gnaoua.* Essaouira est le tapis du vent : les lignes se nouent comme des filets et vibrent comme des cordes — port, thuya, transe Gnaoua. L'alizé y souffle si constamment que la ville s'en est fait un nom ; les jours de grand vent, les cinq navettes y courent à une cadence que nulle autre ville n'atteint, et le tapis s'achève en une après-midi. Un tapis d'Essaouira se reconnaît à son rythme avant même qu'à ses couleurs.
 
-<div class="plate"><img src="fig/rug_essaouira.png" alt="Relevé génératif — Essaouira"/></div>
+<div class="plate"><img src="art_c/08_essaouira.jpg" alt="*MOGADOR WIND LOOM* — Essaouira. Capture de l'œuvre vivante."/></div>
 
-Planche 5 — *MOGADOR WIND LOOM*, relevé génératif (Essaouira, air sec — trame épurée).
+Planche 5 — *MOGADOR WIND LOOM* — Essaouira. Capture de l'œuvre vivante.
 
 ### Agadir — *SOUSS SOLAR WEAVE*
 
-Agadir tisse en jaune solaire et orange, sur le vert profond de l'arganier — l'arbre endémique du Souss, dont la forêt est elle-même un rempart climatique — et le bleu de l'Atlantique. Ville reconstruite après le séisme de 1960, Agadir donne à la série sa tonalité la plus solaire ; et c'est dans le Souss que la crise de l'eau a laissé sa cicatrice la plus visible — 40 000 hectares salinisés par la surexploitation des nappes [11]. Le tapis d'Agadir est lumineux ; son contexte est grave. C'est toute la tension du projet.
+*Souss / Soleil, Arganier et Reconstruction.* Le Souss solaire : branches organiques d'arganier, vagues lumineuses et grille ouverte d'une ville reconstruite après le séisme de 1960. Le jaune solaire et l'orange y dominent, sur le vert profond de l'arganier — l'arbre endémique dont la forêt est elle-même un rempart climatique. Et c'est dans le Souss que la crise de l'eau a laissé sa cicatrice la plus visible — 40 000 hectares salinisés par la surexploitation des nappes [11]. Le tapis d'Agadir est lumineux ; son contexte est grave. C'est toute la tension du projet.
 
-<div class="plate"><img src="fig/rug_agadir.png" alt="Relevé génératif — Agadir"/></div>
+<div class="plate"><img src="art_c/09_agadir.jpg" alt="*SOUSS SOLAR WEAVE* — Agadir. Capture de l'œuvre vivante."/></div>
 
-Planche 6 — *SOUSS SOLAR WEAVE*, relevé génératif (Agadir).
+Planche 6 — *SOUSS SOLAR WEAVE* — Agadir. Capture de l'œuvre vivante.
 
 ## 6.3 Les six autres œuvres : notices
 
-**Tanger — *STRAIT SIGNAL*.** La ville du Détroit tisse en signaux : trame claire, horizontale, traversée de pulsations — le port, les feux, les brouillards de Gibraltar. L'été, quand le levante s'engouffre dans le détroit, la cadence double.
+**Tanger — *STRAIT SIGNAL*.** *Détroit / Entre Deux Mers.* Ville-seuil entre deux mers : diagonales croisées, deux flux maritimes opposés, brume et lignes d'horizon. L'été, quand le levante s'engouffre dans le détroit, la cadence double.
 
-**Tétouan — *ANDALUSIAN WHITE MATRIX*.** La colombe blanche : ivoire, vert d'eau, broderies du Nord. La trame y est la plus régulière de la série, presque textile au sens propre — un hommage aux brodeuses de la médina andalouse.
+**Tétouan — *ANDALUSIAN WHITE MATRIX*.** *Andalousie Blanche / Zellige du Nord.* La médina andalouse blanche se tisse en grille fine, ponctuée d'accents verts et rouges — le rythme textile du Nord, un hommage aux brodeuses de la médina.
 
-**Oujda — *GHARNATI WIND PATTERN*.** La ville frontière, orientale, sèche : trame aérée, ocres et bleus nuit, motifs anguleux du Reggada. L'air continental y produit les tapis les plus épurés — la beauté de la rareté.
+**Oujda — *GHARNATI WIND PATTERN*.** *Orientale / Gharnati Frequency.* L'Oriental en fréquences : bandes sonores, ondes rythmiques du Gharnati et de la Reggada, pulsations du vent continental — les tapis les plus épurés de la série, la beauté de la rareté.
 
-**Kénitra — *SEBOU CORK MATRIX*.** Le liège de la forêt de la Maâmora — l'une des plus grandes futaies de chêne-liège du monde, elle-même menacée par la sécheresse — donne sa matière brune et sa texture ; le Sebou, plus long fleuve du pays, sa ligne d'eau.
+**Kénitra — *SEBOU CORK MATRIX*.** *Sebou / Maâmora Code.* Le fleuve Sebou et la forêt de la Maâmora : veines de bois, lignes fluviales, anneaux de croissance et liège — l'une des plus grandes futaies de chêne-liège du monde, elle-même menacée par la sécheresse.
 
-**Meknès — *IMPERIAL OLIVE GRID*.** La grille impériale : Bab Mansour, Volubilis, et l'olivier — l'arbre-roi du bassin, dont l'alternance se joue des années sèches. Vert olive, noir basaltique, blanc de chaux.
+**Meknès — *IMPERIAL OLIVE GRID*.** *Bab Mansour / Empire et Oliviers.* La ville impériale en symétrie axiale : la porte Bab Mansour, fragments antiques de Volubilis, trames d'oliviers — l'arbre-roi du bassin, dont l'alternance se joue des années sèches.
 
-**El Jadida — *MAZAGAN CISTERN PATTERN*.** La citerne portugaise, son eau noire, son unique œil de lumière : le tapis y joue le reflet — bleu citerne, vert-de-gris de la patine, blanc éclatant. Une œuvre-miroir pour la ville-miroir.
+**El Jadida — *MAZAGAN CISTERN PATTERN*.** *Mazagan / Citerne Atlantique.* La cité portugaise de Mazagan : voûtes en grille, reflets circulaires de la citerne gothique, géométrie des bastions — une œuvre-miroir pour la ville-miroir.
+
+## 6.4 Portfolio — la série complète
+
+Les douze captures qui suivent sont des instants des œuvres vivantes, prélevés sur le site du projet (kamelghabte.me) ; chacune documente un état du climat de sa ville au moment de la capture.
+
+<div class="folio"><img src="art_c/01_casablanca.jpg" alt="Casablanca"/><p class="folio-cap">01 · Casablanca — <i>White Noise Atlantic</i> · La Ville Blanche / Fréquence Atlantique</p></div>
+
+<div class="folio"><img src="art_c/02_rabat.jpg" alt="Rabat"/><p class="folio-cap">02 · Rabat — <i>Oudayas Green Code</i> · Capitale Verte / Oudayas Signal</p></div>
+
+<div class="folio"><img src="art_c/03_fes.jpg" alt="Fès"/><p class="folio-cap">03 · Fès — <i>The Blue Medina Algorithm</i> · Médina Fractale / Savoir et Artisanat</p></div>
+
+<div class="folio"><img src="art_c/04_marrakech.jpg" alt="Marrakech"/><p class="folio-cap">04 · Marrakech — <i>Ochre Heat Pulse</i> · Ville Ocre / Chaleur Rituelle</p></div>
+
+<div class="folio"><img src="art_c/05_tanger.jpg" alt="Tanger"/><p class="folio-cap">05 · Tanger — <i>Strait Signal</i> · Détroit / Entre Deux Mers</p></div>
+
+<div class="folio"><img src="art_c/06_tetouan.jpg" alt="Tétouan"/><p class="folio-cap">06 · Tétouan — <i>Andalusian White Matrix</i> · Andalousie Blanche / Zellige du Nord</p></div>
+
+<div class="folio"><img src="art_c/07_oujda.jpg" alt="Oujda"/><p class="folio-cap">07 · Oujda — <i>Gharnati Wind Pattern</i> · Orientale / Gharnati Frequency</p></div>
+
+<div class="folio"><img src="art_c/08_essaouira.jpg" alt="Essaouira"/><p class="folio-cap">08 · Essaouira — <i>Mogador Wind Loom</i> · Mogador / Vent, Bois et Gnaoua</p></div>
+
+<div class="folio"><img src="art_c/09_agadir.jpg" alt="Agadir"/><p class="folio-cap">09 · Agadir — <i>Souss Solar Weave</i> · Souss / Soleil, Arganier et Reconstruction</p></div>
+
+<div class="folio"><img src="art_c/10_kenitra.jpg" alt="Kénitra"/><p class="folio-cap">10 · Kénitra — <i>Sebou Cork Matrix</i> · Sebou / Maamora Code</p></div>
+
+<div class="folio"><img src="art_c/11_meknes.jpg" alt="Meknès"/><p class="folio-cap">11 · Meknès — <i>Imperial Olive Grid</i> · Bab Mansour / Empire et Oliviers</p></div>
+
+<div class="folio"><img src="art_c/12_el_jadida.jpg" alt="El Jadida"/><p class="folio-cap">12 · El Jadida — <i>Mazagan Cistern Pattern</i> · Mazagan / Citerne Atlantique</p></div>
+
 
 # Chapitre 7 · L'archipel : le réseau comme métier à tisser
 
@@ -476,20 +505,20 @@ Le métier est ouvert. La trame attend. À chacun de saisir la navette de sa vil
 
 Commande : Institut Français du Maroc — Novembre Numérique 2026. Moteur : p5.js v1.11.11. Données : OpenWeather API, rafraîchissement 10 minutes. Grille : 18 × 22 tuiles, 5 navettes simultanées. Export : PNG 6000 px à chaque cycle. Interaction : autopilote continu, clic, contrôleur MIDI.
 
-| N° | Ville (coordonnées) | Titre | Palette principale (HEX) | Motifs caractéristiques |
+| N° | Ville (coordonnées) | Titre | Palette exacte (HEX, fond → accents) | Motifs caractéristiques |
 |---|---|---|---|---|
-| 01 | Casablanca (33,57 N / 7,59 O) | *WHITE NOISE ATLANTIC* | #F5F5F0 · #1B4F72 · #7F8C8D · #0A0A0A · #00BFFF | Étoile art déco, arcade Habous, vague atlantique, zellige octogonal |
-| 02 | Rabat (34,02 N / 6,84 O) | *OUDAYAS GREEN CODE* | #1A5276 · #1E8449 · #FAF0E6 · #D4AC0D · #0D1117 | Grille jardin, chevron Bouregreg, étoile Oudayas |
-| 03 | Fès (34,03 N / 5,00 O) | *THE BLUE MEDINA ALGORITHM* | #1F618D · #CA6F1E · #FDFEFE · #148F77 · #0A0A0A | Khatam dense, croisillon de médina, octogone tannerie |
-| 04 | Marrakech (31,63 N / 8,00 O) | *OCHRE HEAT PULSE* | #D35400 · #C0392B · #1A2463 · #F39C12 · #2C1810 | Rempart (créneau), pulsation Koutoubia, losange Jemaa El-Fna |
-| 05 | Tanger (35,76 N / 5,83 O) | *STRAIT SIGNAL* | Bleus détroit, blanc brume, or port | Signal horizontal, pulsation, horizon |
-| 06 | Tétouan (35,57 N / 5,37 O) | *ANDALUSIAN WHITE MATRIX* | Ivoire, vert d'eau, or discret | Broderie du Nord, trame serrée, chevron andalou |
-| 07 | Oujda (34,68 N / 1,91 O) | *GHARNATI WIND PATTERN* | Ocre sec, bleu nuit, terre frontière | Reggada anguleux, trame aérée, zigzag |
-| 08 | Essaouira (31,51 N / 9,77 O) | *MOGADOR WIND LOOM* | #1A5276 · #FDFEFE · #784212 · #1D8348 · #D5DBDB | Filet, lame de thuya, syncope gnaoua |
-| 09 | Agadir (30,42 N / 9,60 O) | *SOUSS SOLAR WEAVE* | #F4D03F · #E67E22 · #1E8449 · #2E86C1 · #FAD7A0 | Feuille d'arganier, lame atlantique, grille reconstruction |
-| 10 | Kénitra (34,26 N / 6,58 O) | *SEBOU CORK MATRIX* | Bruns liège, vert Maâmora, bleu Sebou | Écorce (texture), ligne de fleuve, hexagone |
-| 11 | Meknès (33,89 N / 5,55 O) | *IMPERIAL OLIVE GRID* | Vert olive, noir basalte, blanc chaux | Bab Mansour (arche), mosaïque Volubilis, olivier |
-| 12 | El Jadida (33,23 N / 8,50 O) | *MAZAGAN CISTERN PATTERN* | #1F4E79 · #5D7B6F · #BDC3C7 · #FDFEFE · #0A0A0A | Reflet (symétrie), bastion, œil de lumière |
+| 01 | Casablanca (33,57 N / 7,59 O) | *WHITE NOISE ATLANTIC* | #0A0A0A · #1B4F72 · #7F8C8D · #F5F5F0 · #00BFFF | Étoile art déco, arcade Habous, vague atlantique, zellige octogonal |
+| 02 | Rabat (34,02 N / 6,84 O) | *OUDAYAS GREEN CODE* | #0D1117 · #1A5276 · #1E8449 · #D4AC0D · #FAF0E6 | Grille jardin, chevron Bouregreg, étoile Oudayas |
+| 03 | Fès (34,03 N / 5,00 O) | *THE BLUE MEDINA ALGORITHM* | #0A0A0A · #1F618D · #148F77 · #CA6F1E · #FDFEFE | Khatam dense, croisillon de médina, octogone tannerie |
+| 04 | Marrakech (31,63 N / 8,00 O) | *OCHRE HEAT PULSE* | #2C1810 · #C0392B · #D35400 · #1A2463 · #F39C12 | Rempart (créneau), pulsation Koutoubia, losange Jemaa El-Fna |
+| 05 | Tanger (35,76 N / 5,83 O) | *STRAIT SIGNAL* | #0A0A14 · #1F3A5F · #2E86C1 · #AED6F1 · #FDFEFE | Signal horizontal, pulsation, horizon |
+| 06 | Tétouan (35,57 N / 5,37 O) | *ANDALUSIAN WHITE MATRIX* | #0D0D0D · #1E8449 · #C0392B · #95A5A6 · #FAFAFA | Broderie du Nord, trame serrée, chevron andalou |
+| 07 | Oujda (34,68 N / 1,91 O) | *GHARNATI WIND PATTERN* | #1B2631 · #784212 · #E59866 · #F0B27A · #FDFEFE | Reggada anguleux, trame aérée, zigzag |
+| 08 | Essaouira (31,51 N / 9,77 O) | *MOGADOR WIND LOOM* | #1A5276 · #1D8348 · #784212 · #D5DBDB · #FDFEFE | Filet, lame de thuya, syncope gnaoua |
+| 09 | Agadir (30,42 N / 9,60 O) | *SOUSS SOLAR WEAVE* | #E67E22 · #F4D03F · #1E8449 · #2E86C1 · #FAD7A0 | Feuille d'arganier, lame atlantique, grille reconstruction |
+| 10 | Kénitra (34,26 N / 6,58 O) | *SEBOU CORK MATRIX* | #1D6A39 · #7D6608 · #2E86C1 · #6E2F1A · #FDFEFE | Écorce (texture), ligne de fleuve, hexagone |
+| 11 | Meknès (33,89 N / 5,55 O) | *IMPERIAL OLIVE GRID* | #0A0A0A · #4A5D23 · #8D8166 · #C9A84C · #8B4513 | Bab Mansour (arche), mosaïque Volubilis, olivier |
+| 12 | El Jadida (33,23 N / 8,50 O) | *MAZAGAN CISTERN PATTERN* | #0A0A0A · #1F4E79 · #5D7B6F · #BDC3C7 · #FDFEFE | Reflet (symétrie), bastion, œil de lumière |
 
 Convention de nommage des exports : `DATA_RUG_IFM_[NN]_[VILLE]_KAMEL_GHABTE_[AAAAMMJJ-HHMM].png`. Chaque export est accompagné de ses métadonnées de cycle : température, humidité, vent, régime (jour/nuit/tempête), durée du cycle.
 
